@@ -1,0 +1,1 @@
+root://fndca1.fnal.gov/pnfs/fnal.gov/usr/dune/persistent/users/hyliao/protodune/proton/v09_26_00/ana/PDSPProd4a_MC_1GeV_reco1_sce_datadriven_v1_nog4rw/mcproton_all.root
