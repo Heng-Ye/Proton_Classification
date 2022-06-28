@@ -2,10 +2,10 @@
 
 Code:<br/>
 -Produce new tree for training\
-├── Tree Maker: **ProtonNewTreeMakerX.C**
+├── Tree Maker: **ProtonNewTreeMakerX.C**\\
 ├── Run "./1_create_tree.sh" to execute the code
  
 -Run training process\
-├── Training/classification code: **TMVAClassification.C**
+├── Training/classification code: **TMVAClassification.C**\\
 ├── Choose the classification methods and execute the training process by "./2_run_training.sh" 
 
