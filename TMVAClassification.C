@@ -268,10 +268,10 @@ void TMVAClassification(TString myMethodList, TString inputFileName, TString out
 
 	// K-Nearest Neighbour classifier (KNN)
 	if (Use["KNN"])
-		//factory->BookMethod( loader, TMVA::Types::kKNN, "KNN",
-				//"H:nkNN=20:ScaleFrac=0.8:SigmaFact=1.0:Kernel=Gaus:UseKernel=F:UseWeight=T:!Trim" ); //<--By default
 		factory->BookMethod( loader, TMVA::Types::kKNN, "KNN",
-				"H:nkNN=3:ScaleFrac=0.8:SigmaFact=1.0:Kernel=Gaus:UseKernel=F:UseWeight=T:!Trim" ); //HY:: set to 3 clusters
+				"H:nkNN=20:ScaleFrac=0.8:SigmaFact=1.0:Kernel=Gaus:UseKernel=F:UseWeight=T:!Trim" ); //<--By default
+		//factory->BookMethod( loader, TMVA::Types::kKNN, "KNN",
+				//"H:nkNN=3:ScaleFrac=0.8:SigmaFact=1.0:Kernel=Gaus:UseKernel=F:UseWeight=T:!Trim" ); //HY:: set to 3 clusters
 
 	// H-Matrix (chi2-squared) method
 	if (Use["HMatrix"])
