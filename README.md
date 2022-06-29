@@ -11,6 +11,6 @@ Code:<br/>
 
 -TMVA GUI\
 ├── Open the TMVA GUI by 'root -l'\
-├── **TMVA::TMVAGui(**“TMVA.root”**)**\
+├── **TMVA::TMVAGui(**“TMVA.root”**)**
 
 
