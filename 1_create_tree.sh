@@ -1,14 +1,22 @@
 #!/bin/bash
 
-inputFileName="protons.root"
+class_name="ProtonNewTreeMaker"
+class_namex=$class_name"X"
+echo $class_namex
 
-#class_methods="PDERSPCA,PDEFoamBoost,KNN,BoostedFisher,MLP,SVM,BDT,RuleFit,DNN_CPU"
-#outputFileName="tmva.root"
-class_methods="KNN,SVM,BDT"
-outputFileName="tmva_knn_svm_bdt.root"
 
-exe_tmva_str="root -b -q 'TMVAClassification.C(\""$class_methods\"", \""$inputFileName\"", \""$outputFileName\"")'"
+#[2]Generate the ana module [to get the data structure of selected trees]
+g++ makemcprotonnorw_ana.cc `root-config --libs --cflags` -o makeproton_ana
 
-#Run training code
-echo "Run TMVA training code ..." $exe_tmva_str" ......"
-eval $exe_tmva_str
+#[3]Run the ana module (input can be changable if needed but still need compile to loop over the selected files)
+./makeproton_ana files_prod4a_new2.txt $class_name
+
+#[4]Fix bugs in the generated makeclass module & create analysis file based on the template
+sed '/Init(tree)\;/i if (tree-\>InheritsFrom(\"TChain\")) ((TChain\*)tree)-\>LoadTree(0);' $class_name".h" > $class_name"_0.h"
+mv $class_name"_0.h" $class_name".h"
+cp -prv $class_namex".C" $class_name".C"
+
+#[5]Run analysis code
+root_exe_str="root -b -q 'RunAna.C(\""$class_name\"")'"
+echo $root_exe_str" ......"
+eval $root_exe_str
