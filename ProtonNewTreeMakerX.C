@@ -514,7 +514,7 @@ void ProtonNewTreeMaker::Loop() {
 			xproj_beam=result.Parameter(0)+result.Parameter(1)*zproj_beam;
 			//cout<<"ck7"<<endl;
 
-			zproj_end=beamtrk_z.at(-1+beamtrk_z->size()); //last hit
+			zproj_end=beamtrk_z->at(-1+beamtrk_z->size()); //last hit
 			yproj_end=result.Parameter(2)+result.Parameter(3)*zproj_end;
 			xproj_end=result.Parameter(0)+result.Parameter(1)*zproj_end;
 
@@ -537,7 +537,7 @@ void ProtonNewTreeMaker::Loop() {
 		TVector3 BC;
 		BC.SetXYZ(xproj_end-xproj_beam, yproj_end-yproj_beam, zproj_end-zproj_beam);
 		TVector3 BA;
-		BA.SetXYZ(beamtrk_x.at(-1+beamtrk_x.size())-xproj_beam, beamtrk_y.at(-1+beamtrk_y.size())-yproj_beam, beamtrk_z.at(-1+beamtrk_z->size())-zproj_beam);
+		BA.SetXYZ(beamtrk_x->at(-1+beamtrk_x->size())-xproj_beam, beamtrk_y->at(-1+beamtrk_y->size())-yproj_beam, beamtrk_z->at(-1+beamtrk_z->size())-zproj_beam);
 		b2=(BA.Cross(BC)).Mag()/BC.Mag();
 		B=b2;
 		//std::cout<<"Minimum distance (b2):"<<b2<<std::endl;
