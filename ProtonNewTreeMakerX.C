@@ -258,7 +258,8 @@ void ProtonNewTreeMaker::Loop() {
 	//TString str_out=Form("signal.root");
 	//TString str_out=Form("signal_train.root");
 	//TString str_out=Form("signal_test.root");
-	TString str_out=Form("protons.root");
+	//TString str_out=Form("protons.root");
+	TString str_out=Form("protons_b2.root");
 
   	TFile *hfile =new TFile(str_out.Data(),"RECREATE");
 	TTree *tree = new TTree("tr","signal");
