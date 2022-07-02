@@ -250,6 +250,7 @@ void ProtonNewTreeMaker::Loop() {
 	Int_t tag=0;
 	Double_t ntrklen=-1;
 	Double_t PID=-1;
+	Double_t B=999;
 
 	//Double_t cos;
 
@@ -264,6 +265,7 @@ void ProtonNewTreeMaker::Loop() {
    	tree->Branch("train", &train, "train/O");
    	tree->Branch("tag", &tag, "tag/I");
    	tree->Branch("ntrklen", &ntrklen, "ntrklen/D");
+   	tree->Branch("B", &B, "B/D");
    	tree->Branch("PID", &PID, "PID/D");
 
 	//Name of output file ------------------------------------------------------------------------------------------------------------//
@@ -440,6 +442,10 @@ void ProtonNewTreeMaker::Loop() {
 		double zproj_beam=0; //set beam z at ff
 		double yproj_beam=0; //ini. value
 		double xproj_beam=0; //ini. value
+
+		double zproj_end=0; //proj zend-pos
+		double yproj_end=0; //proj yend-pos
+		double xproj_end=0; //proj xend-pos
 		int n_fit=3; //num of points used for fitting
 		if (beamtrk_z->size()) {
 
@@ -497,8 +503,8 @@ void ProtonNewTreeMaker::Loop() {
 			//cout<<"ck5"<<endl;
 
 			const ROOT::Fit::FitResult & result = fitter.Result();
-			std::cout << "Total final distance square " << result.MinFcnValue() << std::endl;
-			result.Print(std::cout);
+			//std::cout << "Total final distance square " << result.MinFcnValue() << std::endl;
+			//result.Print(std::cout);
 			//cout<<"ck6"<<endl;
 
 			// get fit parameters
@@ -507,8 +513,36 @@ void ProtonNewTreeMaker::Loop() {
 			xproj_beam=result.Parameter(0)+result.Parameter(1)*zproj_beam;
 			//cout<<"ck7"<<endl;
 
+			zproj_end=beamtrk_z.at(-1+beamtrk_z->size()); //last hit
+			yproj_end=result.Parameter(2)+result.Parameter(3)*zproj_end;
+			xproj_end=result.Parameter(0)+result.Parameter(1)*zproj_end;
+
 			delete gr;
 		}
+
+		//Impact parameter (b2) calculation ---------------------------------------------------------------------------------------------------------------------//
+		//cross-product to calculate b2
+		//         A (end of track)
+		//         *\
+		//         | \
+		//         |  \
+		//         |   \
+		//         |    \
+		// *-------------*B (start of track
+		// C (selected end of line)
+
+		//b2 calculation
+		double b2=-999;
+		TVector3 BC;
+		BC.SetXYZ(xproj_end-xproj_beam, yproj_end-yproj_beam, zproj_end-zproj_beam);
+		TVector3 BA;
+		BA.SetXYZ(beamtrk_x.at(-1+beamtrk_x.size())-xproj_beam, beamtrk_y.at(-1+beamtrk_y.size())-yproj_beam, beamtrk_z.at(-1+beamtrk_z->size())-zproj_beam);
+		b2=(BA.Cross(BC)).Mag()/BC.Mag();
+		B=b2;
+		//std::cout<<"Minimum distance (b2):"<<b2<<std::endl;
+
+		
+
 
 		//[2] Range compensation ----------------------------------------------------------//
 		double range_true_patch=0;
