@@ -249,8 +249,13 @@ void ProtonNewTreeMaker::Loop() {
 	Bool_t train=1; //train sample or not
 	Int_t tag=0;
 	Double_t ntrklen=-1;
+	Double_t trklen=-1;
 	Double_t PID=-1;
 	Double_t B=999;
+	Double_t ecalo=-1;
+	Double_t costheta=-999;
+	Double_t mediandedx=-999;
+	Double_t avecalo=-1;
 
 	//Double_t cos;
 
@@ -259,15 +264,21 @@ void ProtonNewTreeMaker::Loop() {
 	//TString str_out=Form("signal_train.root");
 	//TString str_out=Form("signal_test.root");
 	//TString str_out=Form("protons.root");
-	TString str_out=Form("protons_b2.root");
+	//TString str_out=Form("protons_b2.root");
+	TString str_out=Form("protons_vars.root");
 
   	TFile *hfile =new TFile(str_out.Data(),"RECREATE");
 	TTree *tree = new TTree("tr","signal");
    	tree->Branch("train", &train, "train/O");
    	tree->Branch("tag", &tag, "tag/I");
    	tree->Branch("ntrklen", &ntrklen, "ntrklen/D");
+   	tree->Branch("trklen", &trklen, "trklen/D");
    	tree->Branch("B", &B, "B/D");
    	tree->Branch("PID", &PID, "PID/D");
+   	tree->Branch("ecalo", &ecalo, "ecalo/D");
+   	tree->Branch("costheta", &costheta, "costheta/D");
+   	tree->Branch("mediandedx", &mediandedx, "mediandedx/D");
+   	tree->Branch("avecalo", &avecalo, "avecalo/D");
 
 	//Name of output file ------------------------------------------------------------------------------------------------------------//
 
@@ -716,6 +727,7 @@ void ProtonNewTreeMaker::Loop() {
 			//if (kMIDeg) Fill1DHist(reco_cosineTheta_mideg, cosine_beam_spec_primtrk);
 			//if (kMIDother) Fill1DHist(reco_cosineTheta_midother, cosine_beam_spec_primtrk);
 		} //calosize
+		costheta=cosine_beam_spec_primtrk;
 
 		//xy-cut (has been merged in the BQ cut in the new version)
 		//bool IsXY=false;		
@@ -814,6 +826,9 @@ void ProtonNewTreeMaker::Loop() {
 
 		} //if calo size not empty
 		PID=pid;
+		ecalo=reco_calo_MeV;
+		mediandedx=TMath::Median(trkdedx.size(), &trkdedx.at(0));
+		avecalo=ecalo/range_reco;
 
 		//Reco stopping/Inel p cut ---------------------------------------------------------------------------------------------------------//
 		bool IsRecoStop=false;
@@ -826,6 +841,7 @@ void ProtonNewTreeMaker::Loop() {
 
 		double csda_val_spec=csda_range_vs_mom_sm->Eval(mom_beam_spec);
 		ntrklen=range_reco/csda_val_spec;
+		trklen=range_reco;
 
 		if ((range_reco/csda_val_spec)>=min_norm_trklen_csda&&(range_reco/csda_val_spec)<max_norm_trklen_csda) IsRecoStop=true; //old cut
 		//if ((range_reco/csda_val_spec)<min_norm_trklen_csda) IsRecoInEL=true; //old cut
