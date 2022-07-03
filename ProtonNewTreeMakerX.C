@@ -823,11 +823,11 @@ void ProtonNewTreeMaker::Loop() {
 			} //loop over reco hits of a given track
 
 			pid=chi2pid(trkdedx,trkres); //pid using stopping proton hypothesis
+			mediandedx=TMath::Median(trkdedx.size(), &trkdedx.at(0));
 
 		} //if calo size not empty
 		PID=pid;
 		ecalo=reco_calo_MeV;
-		mediandedx=TMath::Median(trkdedx.size(), &trkdedx.at(0));
 		avecalo=ecalo/range_reco;
 
 		//Reco stopping/Inel p cut ---------------------------------------------------------------------------------------------------------//
