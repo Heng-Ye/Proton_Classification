@@ -252,10 +252,10 @@ void ProtonNewTreeMaker::Loop() {
 	Double_t trklen=-1;
 	Double_t PID=-1;
 	Double_t B=999;
-	Double_t ecalo=-1;
 	Double_t costheta=-999;
 	Double_t mediandedx=-999;
-	Double_t avecalo=-1;
+	Double_t ecalo=0;
+	Double_t avecalo=0;
 
 	//Double_t cos;
 
@@ -275,9 +275,9 @@ void ProtonNewTreeMaker::Loop() {
    	tree->Branch("trklen", &trklen, "trklen/D");
    	tree->Branch("B", &B, "B/D");
    	tree->Branch("PID", &PID, "PID/D");
-   	tree->Branch("ecalo", &ecalo, "ecalo/D");
    	tree->Branch("costheta", &costheta, "costheta/D");
    	tree->Branch("mediandedx", &mediandedx, "mediandedx/D");
+   	tree->Branch("ecalo", &ecalo, "ecalo/D");
    	tree->Branch("avecalo", &avecalo, "avecalo/D");
 
 	//Name of output file ------------------------------------------------------------------------------------------------------------//
@@ -829,6 +829,7 @@ void ProtonNewTreeMaker::Loop() {
 		PID=pid;
 		ecalo=reco_calo_MeV;
 		avecalo=ecalo/range_reco;
+
 
 		//Reco stopping/Inel p cut ---------------------------------------------------------------------------------------------------------//
 		bool IsRecoStop=false;
