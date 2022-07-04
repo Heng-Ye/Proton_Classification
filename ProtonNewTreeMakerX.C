@@ -254,8 +254,8 @@ void ProtonNewTreeMaker::Loop() {
 	Double_t B=999;
 	Double_t costheta=-999;
 	Double_t mediandedx=-999;
-	Double_t ecalo=0;
-	Double_t avecalo=0;
+	Double_t calo=0;
+	Double_t avcalo=0;
 
 	//Double_t cos;
 
@@ -277,8 +277,8 @@ void ProtonNewTreeMaker::Loop() {
    	tree->Branch("PID", &PID, "PID/D");
    	tree->Branch("costheta", &costheta, "costheta/D");
    	tree->Branch("mediandedx", &mediandedx, "mediandedx/D");
-   	tree->Branch("ecalo", &ecalo, "ecalo/D");
-   	tree->Branch("avecalo", &avecalo, "avecalo/D");
+   	tree->Branch("calo", &calo, "calo/D");
+   	tree->Branch("avcalo", &avcalo, "avcalo/D");
 
 	//Name of output file ------------------------------------------------------------------------------------------------------------//
 
@@ -808,6 +808,7 @@ void ProtonNewTreeMaker::Loop() {
 				}
 
 				reco_calo_MeV+=cali_dedx*pitch;
+				//cout<<"reco_calo_MeV:"<<reco_calo_MeV<<"="<<cali_dedx<<"*"<<pitch<<endl;
 				//kereco_range+=pitch*dedx_predict(resrange_reco);
 				//kereco_range2+=pitch*(double)gr_predict_dedx_resrange->Eval(resrange_reco);
 
@@ -827,8 +828,9 @@ void ProtonNewTreeMaker::Loop() {
 
 		} //if calo size not empty
 		PID=pid;
-		ecalo=reco_calo_MeV;
-		avecalo=ecalo/range_reco;
+		calo=reco_calo_MeV;
+		//cout<<"calo:"<<calo<<endl;
+		avcalo=calo/range_reco;
 
 
 		//Reco stopping/Inel p cut ---------------------------------------------------------------------------------------------------------//
