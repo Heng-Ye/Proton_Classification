@@ -246,21 +246,39 @@ void ProtonNewTreeMaker::Loop() {
 
 
 	//Tree Variables -----------------//
+	Bool_t train=1; //train sample or not
 	Int_t tag=0;
 	Double_t ntrklen=-1;
+	Double_t trklen=-1;
 	Double_t PID=-1;
+	Double_t B=999;
+	Double_t costheta=-999;
+	Double_t mediandedx=-999;
+	Double_t calo=-1;
+	Double_t avcalo=-1;
+
 	//Double_t cos;
 
 	//Tree Structures -----------------------------------//
 	//TString str_out=Form("signal.root");
 	//TString str_out=Form("signal_train.root");
-	TString str_out=Form("signal_test.root");
+	//TString str_out=Form("signal_test.root");
+	//TString str_out=Form("protons.root");
+	//TString str_out=Form("protons_b2.root");
+	TString str_out=Form("protons_mva.root");
 
   	TFile *hfile =new TFile(str_out.Data(),"RECREATE");
 	TTree *tree = new TTree("tr","signal");
+   	tree->Branch("train", &train, "train/O");
    	tree->Branch("tag", &tag, "tag/I");
    	tree->Branch("ntrklen", &ntrklen, "ntrklen/D");
+   	tree->Branch("trklen", &trklen, "trklen/D");
+   	tree->Branch("B", &B, "B/D");
    	tree->Branch("PID", &PID, "PID/D");
+   	tree->Branch("costheta", &costheta, "costheta/D");
+   	tree->Branch("mediandedx", &mediandedx, "mediandedx/D");
+   	tree->Branch("calo", &calo, "calo/D");
+   	tree->Branch("avcalo", &avcalo, "avcalo/D");
 
 	//Name of output file ------------------------------------------------------------------------------------------------------------//
 
@@ -278,7 +296,10 @@ void ProtonNewTreeMaker::Loop() {
 		nb = fChain->GetEntry(jentry);   nbytes += nb;
 
 		isTestSample = true;
-		if (ientry%2 == 0) isTestSample = false; //Divide MC sample by 2 parts: test+ufold
+		if (ientry%2 == 0) { 
+			isTestSample = false; //Divide MC sample by 2 parts: test+ufold
+			train=0;
+		}
 		//if (isTestSample) continue; //only validate sample
 		//if (!isTestSample) continue; //only test sample
 
@@ -433,6 +454,10 @@ void ProtonNewTreeMaker::Loop() {
 		double zproj_beam=0; //set beam z at ff
 		double yproj_beam=0; //ini. value
 		double xproj_beam=0; //ini. value
+
+		double zproj_end=0; //proj zend-pos
+		double yproj_end=0; //proj yend-pos
+		double xproj_end=0; //proj xend-pos
 		int n_fit=3; //num of points used for fitting
 		if (beamtrk_z->size()) {
 
@@ -484,14 +509,14 @@ void ProtonNewTreeMaker::Loop() {
 
 			bool ok = fitter.FitFCN();
 			if (!ok) {
-				Error("line3Dfit","Line3D Fit failed");
+				//Error("line3Dfit","Line3D Fit failed");
 				//return 1;
 			}
 			//cout<<"ck5"<<endl;
 
 			const ROOT::Fit::FitResult & result = fitter.Result();
-			std::cout << "Total final distance square " << result.MinFcnValue() << std::endl;
-			result.Print(std::cout);
+			//std::cout << "Total final distance square " << result.MinFcnValue() << std::endl;
+			//result.Print(std::cout);
 			//cout<<"ck6"<<endl;
 
 			// get fit parameters
@@ -500,8 +525,36 @@ void ProtonNewTreeMaker::Loop() {
 			xproj_beam=result.Parameter(0)+result.Parameter(1)*zproj_beam;
 			//cout<<"ck7"<<endl;
 
+			zproj_end=beamtrk_z->at(-1+beamtrk_z->size()); //last hit
+			yproj_end=result.Parameter(2)+result.Parameter(3)*zproj_end;
+			xproj_end=result.Parameter(0)+result.Parameter(1)*zproj_end;
+
 			delete gr;
 		}
+
+		//Impact parameter (b2) calculation ---------------------------------------------------------------------------------------------------------------------//
+		//cross-product to calculate b2
+		//         A (end of track)
+		//         *\
+		//         | \
+		//         |  \
+		//         |   \
+		//         |    \
+		// *-------------*B (start of track
+		// C (selected end of line)
+
+		//b2 calculation
+		double b2=-999;
+		TVector3 BC;
+		BC.SetXYZ(xproj_end-xproj_beam, yproj_end-yproj_beam, zproj_end-zproj_beam);
+		TVector3 BA;
+		BA.SetXYZ(beamtrk_x->at(-1+beamtrk_x->size())-xproj_beam, beamtrk_y->at(-1+beamtrk_y->size())-yproj_beam, beamtrk_z->at(-1+beamtrk_z->size())-zproj_beam);
+		b2=(BA.Cross(BC)).Mag()/BC.Mag();
+		B=b2;
+		//std::cout<<"Minimum distance (b2):"<<b2<<std::endl;
+
+		
+
 
 		//[2] Range compensation ----------------------------------------------------------//
 		double range_true_patch=0;
@@ -674,6 +727,7 @@ void ProtonNewTreeMaker::Loop() {
 			//if (kMIDeg) Fill1DHist(reco_cosineTheta_mideg, cosine_beam_spec_primtrk);
 			//if (kMIDother) Fill1DHist(reco_cosineTheta_midother, cosine_beam_spec_primtrk);
 		} //calosize
+		costheta=cosine_beam_spec_primtrk;
 
 		//xy-cut (has been merged in the BQ cut in the new version)
 		//bool IsXY=false;		
@@ -716,6 +770,7 @@ void ProtonNewTreeMaker::Loop() {
 		if (IsCaloSize) { //if calo size not empty
 			vector<double> trkdedx;
 			vector<double> trkres;
+			reco_calo_MeV=0;
 			for (size_t h=0; h<primtrk_dedx->size(); ++h) { //loop over reco hits of a given track
 				double hitx_reco=primtrk_hitx->at(h);
 				double hity_reco=primtrk_hity->at(h);
@@ -754,6 +809,7 @@ void ProtonNewTreeMaker::Loop() {
 				}
 
 				reco_calo_MeV+=cali_dedx*pitch;
+				//cout<<"reco_calo_MeV:"<<reco_calo_MeV<<"="<<cali_dedx<<"*"<<pitch<<endl;
 				//kereco_range+=pitch*dedx_predict(resrange_reco);
 				//kereco_range2+=pitch*(double)gr_predict_dedx_resrange->Eval(resrange_reco);
 
@@ -769,9 +825,15 @@ void ProtonNewTreeMaker::Loop() {
 			} //loop over reco hits of a given track
 
 			pid=chi2pid(trkdedx,trkres); //pid using stopping proton hypothesis
+			mediandedx=TMath::Median(trkdedx.size(), &trkdedx.at(0));
 
 		} //if calo size not empty
 		PID=pid;
+		//cout<<"reco_calo_MeV:"<<reco_calo_MeV<<endl;
+		calo=reco_calo_MeV;
+		//if (calo>1000.) cout<<"calo:"<<calo<<endl;
+		avcalo=calo/range_reco;
+
 
 		//Reco stopping/Inel p cut ---------------------------------------------------------------------------------------------------------//
 		bool IsRecoStop=false;
@@ -784,6 +846,7 @@ void ProtonNewTreeMaker::Loop() {
 
 		double csda_val_spec=csda_range_vs_mom_sm->Eval(mom_beam_spec);
 		ntrklen=range_reco/csda_val_spec;
+		trklen=range_reco;
 
 		if ((range_reco/csda_val_spec)>=min_norm_trklen_csda&&(range_reco/csda_val_spec)<max_norm_trklen_csda) IsRecoStop=true; //old cut
 		//if ((range_reco/csda_val_spec)<min_norm_trklen_csda) IsRecoInEL=true; //old cut
@@ -902,7 +965,8 @@ void ProtonNewTreeMaker::Loop() {
 
 		//save three here
 		//if (!isTestSample&&kinel&&IsBeamXY&&IsPandoraSlice&&IsCaloSize&&IsBQ) {  //train, basic cuts
-		if (isTestSample&&kinel&&IsBeamXY&&IsPandoraSlice&&IsCaloSize&&IsBQ) {  //test, basic cuts
+		//if (isTestSample&&kinel&&IsBeamXY&&IsPandoraSlice&&IsCaloSize&&IsBQ) {  //test, basic cuts
+		if (IsBeamXY&&IsPandoraSlice&&IsCaloSize&&IsBQ) {  //test, basic cuts
 			tree->Fill();
 		} //basic cuts
 
