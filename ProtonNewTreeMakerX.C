@@ -254,8 +254,9 @@ void ProtonNewTreeMaker::Loop() {
 	Double_t B=999;
 	Double_t costheta=-999;
 	Double_t mediandedx=-999;
-	Double_t calo=0;
-	Double_t avcalo=0;
+	Double_t endpointdedx=-999;
+	Double_t calo=-1;
+	Double_t avcalo=-1;
 
 	//Double_t cos;
 
@@ -265,7 +266,8 @@ void ProtonNewTreeMaker::Loop() {
 	//TString str_out=Form("signal_test.root");
 	//TString str_out=Form("protons.root");
 	//TString str_out=Form("protons_b2.root");
-	TString str_out=Form("protons_vars.root");
+	//TString str_out=Form("protons_mva.root");
+	TString str_out=Form("protons_mva2.root");
 
   	TFile *hfile =new TFile(str_out.Data(),"RECREATE");
 	TTree *tree = new TTree("tr","signal");
@@ -277,6 +279,7 @@ void ProtonNewTreeMaker::Loop() {
    	tree->Branch("PID", &PID, "PID/D");
    	tree->Branch("costheta", &costheta, "costheta/D");
    	tree->Branch("mediandedx", &mediandedx, "mediandedx/D");
+   	tree->Branch("endpointdedx", &endpointdedx, "endpointdedx/D");
    	tree->Branch("calo", &calo, "calo/D");
    	tree->Branch("avcalo", &avcalo, "avcalo/D");
 
@@ -770,6 +773,7 @@ void ProtonNewTreeMaker::Loop() {
 		if (IsCaloSize) { //if calo size not empty
 			vector<double> trkdedx;
 			vector<double> trkres;
+			reco_calo_MeV=0;
 			for (size_t h=0; h<primtrk_dedx->size(); ++h) { //loop over reco hits of a given track
 				double hitx_reco=primtrk_hitx->at(h);
 				double hity_reco=primtrk_hity->at(h);
@@ -825,11 +829,15 @@ void ProtonNewTreeMaker::Loop() {
 
 			pid=chi2pid(trkdedx,trkres); //pid using stopping proton hypothesis
 			mediandedx=TMath::Median(trkdedx.size(), &trkdedx.at(0));
+			if (trkdedx.size()>=2) {
+				endpointdedx=0.5*(trkdedx.at(-1+trkdedx.size())+trkdedx.at(-2+trkdedx.size()));
+			}
 
 		} //if calo size not empty
 		PID=pid;
+		//cout<<"reco_calo_MeV:"<<reco_calo_MeV<<endl;
 		calo=reco_calo_MeV;
-		//cout<<"calo:"<<calo<<endl;
+		//if (calo>1000.) cout<<"calo:"<<calo<<endl;
 		avcalo=calo/range_reco;
 
 
