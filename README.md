@@ -15,7 +15,7 @@ Code:<br/>
 ├── Select "ROC" curve for the trained performance\
 ├── After selecting the ROC curve, the weighted results will be altomatically generated
 
--Use the trained results and apply on data
+-Use the trained results and apply on data\
 ├── Main code: **TMVAClassificationApplication.C**\
 ├── Run "./3_apply_cut.sh"
 
