@@ -248,15 +248,15 @@ void ProtonNewTreeMaker::Loop() {
 	//Tree Variables -----------------//
 	Bool_t train=1; //train sample or not
 	Int_t tag=0;
-	Double_t ntrklen=-1;
-	Double_t trklen=-1;
-	Double_t PID=-1;
-	Double_t B=999;
-	Double_t costheta=-999;
-	Double_t mediandedx=-999;
-	Double_t endpointdedx=-999;
-	Double_t calo=-1;
-	Double_t avcalo=-1;
+	Float_t ntrklen=-1;
+	Float_t trklen=-1;
+	Float_t PID=-1;
+	Float_t B=999;
+	Float_t costheta=-999;
+	Float_t mediandedx=-999;
+	Float_t endpointdedx=-999;
+	Float_t calo=-1;
+	Float_t avcalo=-1;
 
 	//Double_t cos;
 
@@ -273,15 +273,15 @@ void ProtonNewTreeMaker::Loop() {
 	TTree *tree = new TTree("tr","signal");
    	tree->Branch("train", &train, "train/O");
    	tree->Branch("tag", &tag, "tag/I");
-   	tree->Branch("ntrklen", &ntrklen, "ntrklen/D");
-   	tree->Branch("trklen", &trklen, "trklen/D");
-   	tree->Branch("B", &B, "B/D");
-   	tree->Branch("PID", &PID, "PID/D");
-   	tree->Branch("costheta", &costheta, "costheta/D");
-   	tree->Branch("mediandedx", &mediandedx, "mediandedx/D");
-   	tree->Branch("endpointdedx", &endpointdedx, "endpointdedx/D");
-   	tree->Branch("calo", &calo, "calo/D");
-   	tree->Branch("avcalo", &avcalo, "avcalo/D");
+   	tree->Branch("ntrklen", &ntrklen, "ntrklen/F");
+   	tree->Branch("trklen", &trklen, "trklen/F");
+   	tree->Branch("B", &B, "B/F");
+   	tree->Branch("PID", &PID, "PID/F");
+   	tree->Branch("costheta", &costheta, "costheta/F");
+   	tree->Branch("mediandedx", &mediandedx, "mediandedx/F");
+   	tree->Branch("endpointdedx", &endpointdedx, "endpointdedx/F");
+   	tree->Branch("calo", &calo, "calo/F");
+   	tree->Branch("avcalo", &avcalo, "avcalo/F");
 
 	//Name of output file ------------------------------------------------------------------------------------------------------------//
 

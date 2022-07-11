@@ -150,6 +150,7 @@ void TMVAClassification(TString myMethodList, TString inputFileName, TString out
 	loader->AddVariable( "PID", 'D' ); //chi^2-pid (stopping proton hypothesis)
 	loader->AddVariable( "B", 'D' ); //impact parameter
 	loader->AddVariable( "mediandedx", 'D' ); //median dedx
+	loader->AddVariable( "endpointdedx", 'D' ); //endpoint dedx
 	loader->AddVariable( "calo", 'D' ); //calorimetric energy
 	loader->AddVariable( "avcalo", 'D' ); //calorimetric energy/trklen
 	loader->AddVariable( "costheta", 'D' ); //costheta
