@@ -10,11 +10,12 @@ inputSourceFileName="protons_mva2.root"
 #inputTrainingFileName="tmva_star_cast_mva2.root"
 
 #save results after TMVA cuts
-OutputFileName="tmva_app_bdt_mva2.root"
+outputFileName="tmva_app_bdt_mva2.root"
 
 
 
-exe_tmva_str="root -b -q 'TMVApplication.C(\""$class_methods\"", \""$inputSourceFileName\"", \""$outputFileName\"")'"
+#exe_tmva_str="root -b -q 'TMVApplication.C(\""$class_methods\"", \""$inputSourceFileName\"", \""$outputFileName\"")'"
+exe_tmva_str="root -b -q 'TMVAClassificationApplication.C(\""$class_methods\"", \""$inputSourceFileName\"", \""$outputFileName\"")'"
 
 #Run training code
 echo "Run TMVA training code ..." $exe_tmva_str" ......"
