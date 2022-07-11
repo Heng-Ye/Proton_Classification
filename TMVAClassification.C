@@ -145,15 +145,15 @@ void TMVAClassification(TString myMethodList, TString inputFileName, TString out
 	//Add variables for training
 	//loader->AddVariable( "train", 'O' ); //train or test set
 	//loader->AddVariable( "tag", 'I' ); //true labels
-	loader->AddVariable( "ntrklen", 'D' ); //normalized track length
-	loader->AddVariable( "trklen", 'D' ); //track length
-	loader->AddVariable( "PID", 'D' ); //chi^2-pid (stopping proton hypothesis)
-	loader->AddVariable( "B", 'D' ); //impact parameter
-	loader->AddVariable( "mediandedx", 'D' ); //median dedx
-	loader->AddVariable( "endpointdedx", 'D' ); //endpoint dedx
-	loader->AddVariable( "calo", 'D' ); //calorimetric energy
-	loader->AddVariable( "avcalo", 'D' ); //calorimetric energy/trklen
-	loader->AddVariable( "costheta", 'D' ); //costheta
+	loader->AddVariable( "ntrklen", 'F' ); //normalized track length
+	loader->AddVariable( "trklen", 'F' ); //track length
+	loader->AddVariable( "PID", 'F' ); //chi^2-pid (stopping proton hypothesis)
+	loader->AddVariable( "B", 'F' ); //impact parameter
+	loader->AddVariable( "mediandedx", 'F' ); //median dedx
+	loader->AddVariable( "endpointdedx", 'F' ); //endpoint dedx
+	loader->AddVariable( "calo", 'F' ); //calorimetric energy
+	loader->AddVariable( "avcalo", 'F' ); //calorimetric energy/trklen
+	loader->AddVariable( "costheta", 'F' ); //costheta
 
 	//true label list
 	//tag=1; //kinel
