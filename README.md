@@ -11,8 +11,8 @@ Code:<br/>
 
 -Use TMVA GUI to see the trained results\
 ├── Open the TMVA GUI by 'root -l'\
-├── **TMVA::TMVAGui(**“TMVA.root”**)**
-├── Select "ROC" curve for the trained performance
+├── **TMVA::TMVAGui(**“TMVA.root”**)**\
+├── Select "ROC" curve for the trained performance\
 ├── After selecting the ROC curve, the weighted results will be altomatically generated
 
 -Use the trained results and apply on data
