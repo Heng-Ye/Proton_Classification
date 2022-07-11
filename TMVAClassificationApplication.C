@@ -202,6 +202,8 @@ void TMVAClassificationApplication(TString myMethodList, TString fname, TString 
    TH1F *histNnC(0);
    TH1F *histNnT(0);
    TH1F *histBdt(0);
+   TH1F *histBdt_Signal(0); //HY
+   TH1F *histBdt_Backgrounds(0); //HY
    TH1F *histBdtG(0);
    TH1F *histBdtB(0);
    TH1F *histBdtD(0);
@@ -238,7 +240,12 @@ void TMVAClassificationApplication(TString myMethodList, TString fname, TString 
    if (Use["TMlpANN"])       histNnT     = new TH1F( "MVA_TMlpANN",       "MVA_TMlpANN",       nbin, -1.3, 1.3 );
    if (Use["DNN_GPU"]) histDnnGpu = new TH1F("MVA_DNN_GPU", "MVA_DNN_GPU", nbin, -0.1, 1.1);
    if (Use["DNN_CPU"]) histDnnCpu = new TH1F("MVA_DNN_CPU", "MVA_DNN_CPU", nbin, -0.1, 1.1);
-   if (Use["BDT"])           histBdt     = new TH1F( "MVA_BDT",           "MVA_BDT",           nbin, -0.8, 0.8 );
+   //if (Use["BDT"])           histBdt     = new TH1F( "MVA_BDT",           "MVA_BDT",           nbin, -0.8, 0.8 );
+   if (Use["BDT"]) {
+   	   histBdt     = new TH1F( "MVA_BDT",           "MVA_BDT",           nbin, -0.8, 0.8 );
+           histBdt_Signal     = new TH1F( "MVA_BDT_Signal",           "MVA_BDT_Signal",           nbin, -0.8, 0.8 );
+           histBdt_Backgrounds     = new TH1F( "MVA_BDT_Backgrounds",           "MVA_BDT_Backgrounds",           nbin, -0.8, 0.8 );
+   }	
    if (Use["BDTG"])          histBdtG    = new TH1F( "MVA_BDTG",          "MVA_BDTG",          nbin, -1.0, 1.0 );
    if (Use["BDTB"])          histBdtB    = new TH1F( "MVA_BDTB",          "MVA_BDTB",          nbin, -1.0, 1.0 );
    if (Use["BDTD"])          histBdtD    = new TH1F( "MVA_BDTD",          "MVA_BDTD",          nbin, -0.8, 0.8 );
@@ -297,7 +304,9 @@ void TMVAClassificationApplication(TString myMethodList, TString fname, TString 
    //   but of course you can use different ones and copy the values inside the event loop
    TTree* theTree = (TTree*)input->Get("tr");
    std::cout << "--- Select signal sample" << std::endl;
+   Int_t tag;
 
+   	theTree->SetBranchAddress( "tag", &tag);
 	theTree->SetBranchAddress( "ntrklen", &ntrklen);
 	theTree->SetBranchAddress( "trklen", &trklen);
 	theTree->SetBranchAddress( "PID", &PID);
@@ -356,7 +365,17 @@ void TMVAClassificationApplication(TString myMethodList, TString fname, TString 
       if (Use["TMlpANN"      ])   histNnT    ->Fill( reader->EvaluateMVA( "TMlpANN method"       ) );
       if (Use["DNN_GPU"]) histDnnGpu->Fill(reader->EvaluateMVA("DNN_GPU method"));
       if (Use["DNN_CPU"]) histDnnCpu->Fill(reader->EvaluateMVA("DNN_CPU method"));
-      if (Use["BDT"          ])   histBdt    ->Fill( reader->EvaluateMVA( "BDT method"           ) );
+      //if (Use["BDT"          ])   histBdt    ->Fill( reader->EvaluateMVA( "BDT method"           ) );
+      if (Use["BDT"          ]) {
+	   Double_t mvd_bdt_score=reader->EvaluateMVA("BDT method"); 
+	   histBdt->Fill(mvd_bdt_score);
+	   if (tag==1) {
+	   	histBdt_Signal->Fill(mvd_bdt_score);
+	   }
+	   else {
+	   	histBdt_Backgrounds->Fill(mvd_bdt_score);
+           }
+      }	
       if (Use["BDTG"         ])   histBdtG   ->Fill( reader->EvaluateMVA( "BDTG method"          ) );
       if (Use["BDTB"         ])   histBdtB   ->Fill( reader->EvaluateMVA( "BDTB method"          ) );
       if (Use["BDTD"         ])   histBdtD   ->Fill( reader->EvaluateMVA( "BDTD method"          ) );
@@ -442,7 +461,12 @@ void TMVAClassificationApplication(TString myMethodList, TString fname, TString 
    if (Use["TMlpANN"      ])   histNnT    ->Write();
    if (Use["DNN_GPU"]) histDnnGpu->Write();
    if (Use["DNN_CPU"]) histDnnCpu->Write();
-   if (Use["BDT"          ])   histBdt    ->Write();
+   //if (Use["BDT"          ])   histBdt    ->Write();
+   if (Use["BDT"          ]) {
+	   histBdt->Write();
+	   histBdt_Signal->Write();
+	   histBdt_Backgrounds->Write();
+   } 
    if (Use["BDTG"         ])   histBdtG   ->Write();
    if (Use["BDTB"         ])   histBdtB   ->Write();
    if (Use["BDTD"         ])   histBdtD   ->Write();
