@@ -229,7 +229,10 @@ void TMVAClassificationApplication(TString myMethodList, TString fname, TString 
 	double ed_chi2=150;
 	TH2D *ntrklen_chi2pid=new TH2D("ntrklen_chi2pid","", n_ntrklen, st_ntrklen, ed_ntrklen, n_chi2, st_chi2, ed_chi2);
 	TH2D *ntrklen_chi2pid_Inel=new TH2D("ntrklen_chi2pid_Inel","", n_ntrklen, st_ntrklen, ed_ntrklen, n_chi2, st_chi2, ed_chi2);
+	TH2D *ntrklen_chi2pid_Inel_True=new TH2D("ntrklen_chi2pid_Inel_True","", n_ntrklen, st_ntrklen, ed_ntrklen, n_chi2, st_chi2, ed_chi2);
 	TH2D *ntrklen_chi2pid_BDTInel=new TH2D("ntrklen_chi2pid_BDTInel","", n_ntrklen, st_ntrklen, ed_ntrklen, n_chi2, st_chi2, ed_chi2);
+	TH2D *ntrklen_chi2pid_BDTInel_True=new TH2D("ntrklen_chi2pid_BDTInel_True","", n_ntrklen, st_ntrklen, ed_ntrklen, n_chi2, st_chi2, ed_chi2);
+	TH2D *ntrklen_chi2pid_TrueInel=new TH2D("ntrklen_chi2pid_TrueInel","", n_ntrklen, st_ntrklen, ed_ntrklen, n_chi2, st_chi2, ed_chi2);
 
 	double mean_norm_trklen_csda=9.01289e-01; //prod4a (spec)
 	double sigma_norm_trklen_csda=7.11431e-02; //prod4a (spec)
@@ -375,7 +378,10 @@ void TMVAClassificationApplication(TString myMethodList, TString fname, TString 
 		} //stopping p region
 
 		ntrklen_chi2pid->Fill(ntrklen,PID); 
-		if (IsRecoInEL) ntrklen_chi2pid_Inel->Fill(ntrklen,PID);
+		if (IsRecoInEL) { 
+			ntrklen_chi2pid_Inel->Fill(ntrklen,PID);
+			if (tag==1) ntrklen_chi2pid_Inel_True->Fill(ntrklen,PID);
+		}
 
 
 
@@ -412,9 +418,13 @@ void TMVAClassificationApplication(TString myMethodList, TString fname, TString 
 				if (Use["BDT"          ]) {
 					Double_t mvd_bdt_score=reader->EvaluateMVA("BDT method"); 
 					histBdt->Fill(mvd_bdt_score);
-					if (mvd_bdt_score>0) ntrklen_chi2pid_BDTInel->Fill(ntrklen, PID); 
+					if (mvd_bdt_score>0) { 
+						ntrklen_chi2pid_BDTInel->Fill(ntrklen, PID);
+						if (tag==1) ntrklen_chi2pid_BDTInel_True->Fill(ntrklen, PID); 
+					}
 					if (tag==1) {
 						histBdt_Signal->Fill(mvd_bdt_score);
+						ntrklen_chi2pid_TrueInel->Fill(ntrklen, PID); 
 					}
 					else {
 						histBdt_Backgrounds->Fill(mvd_bdt_score);
@@ -513,7 +523,9 @@ void TMVAClassificationApplication(TString myMethodList, TString fname, TString 
 
 		ntrklen_chi2pid->Write();
 		ntrklen_chi2pid_Inel->Write();
+		ntrklen_chi2pid_Inel_True->Write();
 		ntrklen_chi2pid_BDTInel->Write();
+		ntrklen_chi2pid_TrueInel->Write();
 
 	} 
 	if (Use["BDTG"         ])   histBdtG   ->Write();
