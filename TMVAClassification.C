@@ -164,13 +164,13 @@ void TMVAClassification(TString myMethodList = "", TString fname="", TString fou
 
    dataloader->AddVariable( "ntrklen", 'F' );
    dataloader->AddVariable( "trklen", 'F' );
-   dataloader->AddVariable( "B", 'F' );
    dataloader->AddVariable( "PID", 'F' );
-   dataloader->AddVariable( "costheta", 'F' );
+   dataloader->AddVariable( "B", 'F' );
    dataloader->AddVariable( "mediandedx", 'F' );
    dataloader->AddVariable( "endpointdedx", 'F' );
    dataloader->AddVariable( "calo", 'F' );
    dataloader->AddVariable( "avcalo", 'F' );
+   dataloader->AddVariable( "costheta", 'F' );
 
    // but will appear in the final "TestTree" produced by TMVA. This TestTree will contain the
    // input variables, the response values of all trained MVAs, and the spectator variables
