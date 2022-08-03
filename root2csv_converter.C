@@ -71,7 +71,7 @@ void root2csv_converter() {
 	   //if (i<10) cout<<"trklen: "<<trklen<<endl;
 
            bool isTestSample = true;
-           if (ientry%2 == 0) {
+           if (i%2 == 0) {
            	isTestSample = false; //Divide MC sample by 2 parts: test+ufold
                         train=0;
            }
