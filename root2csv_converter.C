@@ -69,9 +69,16 @@ void root2csv_converter() {
 	   tr->GetEntry(i);
            if (i%1000==0) std::cout<<i<<"/"<<nentries<<std::endl;
 	   //if (i<10) cout<<"trklen: "<<trklen<<endl;
+
+           bool isTestSample = true;
+           if (ientry%2 == 0) {
+           	isTestSample = false; //Divide MC sample by 2 parts: test+ufold
+                        train=0;
+           }
+
 	   fout<<train<<","<<tag<<","<<ntrklen<<","<<trklen<<","<<PID<<","<<B<<","<<costheta<<","<<mediandedx<<","<<endpointdedx<<","<<calo<<","<<avcalo<<"\n";	
-	   if (train==1) fout_train<<tag<<","<<ntrklen<<","<<trklen<<","<<PID<<","<<B<<","<<costheta<<","<<mediandedx<<","<<endpointdedx<<","<<calo<<","<<avcalo<<"\n";	
-	   if (train==0) fout_test<<tag<<","<<ntrklen<<","<<trklen<<","<<PID<<","<<B<<","<<costheta<<","<<mediandedx<<","<<endpointdedx<<","<<calo<<","<<avcalo<<"\n";	
+	   if (!isTestSample) fout_train<<tag<<","<<ntrklen<<","<<trklen<<","<<PID<<","<<B<<","<<costheta<<","<<mediandedx<<","<<endpointdedx<<","<<calo<<","<<avcalo<<"\n";	
+	   if (isTestSample) fout_test<<tag<<","<<ntrklen<<","<<trklen<<","<<PID<<","<<B<<","<<costheta<<","<<mediandedx<<","<<endpointdedx<<","<<calo<<","<<avcalo<<"\n";	
 
 	}
   	fout.close();
