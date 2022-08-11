@@ -36,14 +36,28 @@ xgb = XGBClassifier(param)
 #train_data = pd.read_csv("protons_mva2_train.csv",usecols=[1,2]) # Only reads col1, col2.
 #train_data = pd.read_csv("protons_mva2_train.csv",usecols=['ntrklen']) # Only reads 'ntrklen' 
 #train_data = pd.read_csv("protons_mva2_train.csv", sep=',', header=None, skiprows=1) #skip the top row 
-train_data_raw = pd.read_csv("protons_mva2_train.csv", sep=',', header=None)
-test_data_raw = pd.read_csv("protons_mva2_test.csv", sep=',', header=None)
+train_data = pd.read_csv("protons_mva2_train.csv", sep=',', header=None)
+#test_data_raw = pd.read_csv("protons_mva2_test.csv", sep=',', header=None)
 
-train_data = train_data_raw.T #transpose
-test_data = test_data_raw.T
+#rename header
+print(train_data.head(3))
 
-print(train_data_raw.shape)
-print(train_data.shape)
+train_data.rename({'tag':'tag', 'ntrklen':'0', 'trklen':'1', 'PID':'2', 'B':'3', 'costheta':'4', 'mediandedx':'5', 'endpointdedx':'6', 'calo':'7', 'avcalo':'8'}, axis=1, inplace=True)
+print(train_data.head(3))
+
+
+
+
+
+
+
+
+
+#train_data = train_data_raw.T #transpose
+#test_data = test_data_raw.T
+
+#print(train_data_raw.shape)
+#print(train_data.shape)
 
 
 #header_train_data=train_data.columns #get header
