@@ -114,8 +114,15 @@ y_valid_pred = model_xgboost.predict_proba(X_valid)[:,1]
 #2nd value: prob. of that observation being a 1
 #We are working with prediction prob of 1, so index is chosed to be 1 here
 
+#Compute Area Under the Receiver Operating Characteristic Curve (ROC AUC) from prediction scores.
 print("AUC Train: {:.4f}\nAUC Valid: {:.4f}".format(roc_auc_score(y_train, y_train_pred),
                                                     roc_auc_score(y_valid, y_valid_pred)))
+
+#y_train_bkg_pred = model_xgboost.predict_proba(X_train)[:,0]
+#y_valid_bkg_pred = model_xgboost.predict_proba(X_valid)[:,0]
+#print("AUC Train(bkg): {:.4f}\nAUC Valid(bkg): {:.4f}".format(roc_auc_score(y_train, y_train_bkg_pred),
+#                                                    roc_auc_score(y_valid, y_valid_bkg_pred)))
+
 
 #Hyperparameter Tuning --------------------------
 
