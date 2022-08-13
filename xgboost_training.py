@@ -124,42 +124,144 @@ print("AUC Train: {:.4f}\nAUC Valid: {:.4f}".format(roc_auc_score(y_train, y_tra
 #                                                    roc_auc_score(y_valid, y_valid_bkg_pred)))
 
 
-#Hyperparameter Tuning --------------------------
+#Hyperparameter Tuning --------------------------------------------------------------------------------
+#Use 3 hyper pars (27 configs.) as an example
+learning_rate_list = [0.02, 0.05, 0.1]
+max_depth_list = [2, 3, 5]
+n_estimators_list = [1000, 2000, 3000]
+
+#transform pars into dict.
+params_dict = {"learning_rate": learning_rate_list,
+               "max_depth": max_depth_list,
+               "n_estimators": n_estimators_list}
+
+num_combinations = 1
+for v in params_dict.values(): num_combinations *= len(v) 
+
+print(num_combinations)
+params_dict
+
+def my_roc_auc_score(model, X, y): return roc_auc_score(y, model.predict_proba(X)[:,1])
+
+model_xgboost_hp = GridSearchCV(estimator=xgboost.XGBClassifier(subsample=0.5,
+                                                                colsample_bytree=0.25,
+                                                                eval_metric='auc',
+                                                                use_label_encoder=False),
+                                param_grid=params_dict,
+                                cv=4,
+                                scoring=my_roc_auc_score,
+                                return_train_score=True,
+                                verbose=4)
+
+model_xgboost_hp.fit(X, y)
+
+#cv:=cross-validation:num. of samples of data will splitted (into 2 parts in this case) 
+#in this case 2 iterations will be applied on data: 1st part for training, 2nd part for validation
+#in general cv=3 or 4
+#evaluation of model using roc_auc
+#return_train_score=True:=as a output of x-validation, training score will also be printed
+#verbose=4:=how much of the logs will be printed
+
+df_cv_results = pd.DataFrame(model_xgboost_hp.cv_results_)
+df_cv_results = df_cv_results[['rank_test_score','mean_test_score','mean_train_score',
+                               'param_learning_rate', 'param_max_depth', 'param_n_estimators']]
+df_cv_results.sort_values(by='rank_test_score', inplace=True)
+df_cv_results
 
 
+#Performance changes by chaning hyper parameters: plots ----------------------------------------------------------
+# First sort by number of estimators as that would be x-axis
+df_cv_results.sort_values(by='param_n_estimators', inplace=True)
 
-# specify parameters via map
-#param = {'n_estimators':50}
-#xgb = XGBClassifier(param)
+# Find values of AUC for learning rate of 0.05 and different values of depth
+lr_d2 = df_cv_results.loc[(df_cv_results['param_learning_rate']==0.05) & (df_cv_results['param_max_depth']==2),:]
+lr_d3 = df_cv_results.loc[(df_cv_results['param_learning_rate']==0.05) & (df_cv_results['param_max_depth']==3),:]
+lr_d5 = df_cv_results.loc[(df_cv_results['param_learning_rate']==0.05) & (df_cv_results['param_max_depth']==5),:]
+lr_d7 = df_cv_results.loc[(df_cv_results['param_learning_rate']==0.05) & (df_cv_results['param_max_depth']==7),:]
+
+# Let us plot now
+fig, ax = plt.subplots(figsize=(10,5))
+lr_d2.plot(x='param_n_estimators', y='mean_test_score', label='Depth=2', ax=ax)
+lr_d3.plot(x='param_n_estimators', y='mean_test_score', label='Depth=3', ax=ax)
+lr_d5.plot(x='param_n_estimators', y='mean_test_score', label='Depth=5', ax=ax)
+lr_d7.plot(x='param_n_estimators', y='mean_test_score', label='Depth=7', ax=ax)
+plt.ylabel('Mean Validation AUC')
+plt.title('Performance wrt # of Trees and Depth')
+plt.savefig('xgboost_1_hyperparameter_tunning_Performance_wrt_num_of_Trees_and_Depth.png')
+#in this case, learning_rate is kept const.
+#x-axis: param_n_estimators=# of trees
+#y-axis: Validation AUC
+
+#Fine-tunning the hyper parameters -----------------------------------------------------------------------------------
+# First sort by learning rate as that would be x-axis
+df_cv_results.sort_values(by='param_learning_rate', inplace=True)
+
+# Find values of AUC for learning rate of 0.05 and different values of depth
+lr_t3k_d2 = df_cv_results.loc[(df_cv_results['param_n_estimators']==3000) & (df_cv_results['param_max_depth']==2),:]
+
+# Let us plot now
+fig, ax = plt.subplots(figsize=(10,5))
+lr_t3k_d2.plot(x='param_learning_rate', y='mean_test_score', label='Depth=2, Trees=3000', ax=ax)
+plt.ylabel('Mean Validation AUC')
+plt.title('Performance wrt learning rate')
+plt.savefig('xgboost_2_Performance_wrt_learning_rate.png')
+
+#Final Model ---------------------------------------------------------------------------------------------------
+#After hyper parameter tunning, we can pick up the best parameters to build our model
+model_xgboost_fin = xgboost.XGBClassifier(learning_rate=0.05,
+                                          max_depth=2,
+                                          n_estimators=5000,
+                                          subsample=0.5,
+                                          colsample_bytree=0.25,
+                                          eval_metric='auc',
+                                          verbosity=1,
+                                          use_label_encoder=False)
+
+# Passing both training and validation dataset as we want to plot AUC for both
+eval_set = [(X_train, y_train),(X_valid, y_valid)]
 
 
+model_xgboost_fin.fit(X_train,
+                  y_train,
+                  early_stopping_rounds=20,
+                  eval_set=eval_set,
+                  verbose=True)
+
+y_train_pred = model_xgboost_fin.predict_proba(X_train)[:,1]
+y_valid_pred = model_xgboost_fin.predict_proba(X_valid)[:,1]
+
+print("AUC Train: {:.4f}\nAUC Valid: {:.4f}".format(roc_auc_score(y_train, y_train_pred),
+                                                    roc_auc_score(y_valid, y_valid_pred)))
 
 
+evaluation_results = model_xgboost_fin.evals_result()
 
+# Index into each key to find AUC values for training and validation data after each tree
+train_auc_tree = evaluation_results['validation_0']['auc']
+valid_auc_tree = evaluation_results['validation_1']['auc']
 
-#train_data = train_data_raw.T #transpose
-#test_data = test_data_raw.T
+# Plotting Section
+plt.figure(figsize=(15,5))
 
-#print(train_data_raw.shape)
-#print(train_data.shape)
+plt.plot(train_auc_tree, label='Train')
+plt.plot(valid_auc_tree, label='valid')
 
+plt.title("Train and validation AUC as number of trees increase")
+plt.xlabel("Trees")
+plt.ylabel("AUC")
+plt.legend(loc='lower right')
+#plt.show()
+plt.savefig('xgboost_3_AUC_tree_num.png')
 
-#header_train_data=train_data.columns #get header
+#Feature importance using variable importance --------------------------------------------
+df_var_imp = pd.DataFrame({"Variable": var_colums,
+                           "Importance": model_xgboost_fin.feature_importances_}) \
+                        .sort_values(by='Importance', ascending=False)
+#df_var_imp[:10]
+df_var_imp[:10]
 
-#train_Variable = train_data['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-'''
-train_Score = train_data['Type'] # Score should be integer, 0, 1, (2 and larger for multiclass)
-
-test_Variable = test_data['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-test_Score = test_data['Type']
-
-# Now the data are well prepared and named as train_Variable, train_Score and test_Variable, test_Score.
-xgb.fit(train_Variable, train_Score) # Training
-xgb.predict(test_Variable) # Outputs are integers
-xgb.predict_proba(test_Variable) # Output scores , output structre: [prob for 0, prob for 1,...]
-xgb.save_model("xgb.model") # Saving model
-'''
-
+#Save model
+model_xgboost_fin.save_model("xgb.model")
 
 
 
