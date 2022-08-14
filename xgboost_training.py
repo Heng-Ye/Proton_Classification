@@ -87,7 +87,9 @@ feature_names = var_colums
 #print out all parameters that can be used/tunned
 print(xgb.XGBClassifier().get_params())
 
-model_xgb = xgb.XGBClassifier(learning_rate=0.1,
+
+#model_xgb = xgb.XGBClassifier(learning_rate=0.1,
+model_xgb = xgb.XGBRegressor(learning_rate=0.1,
                                       max_depth=5,
                                       n_estimators=5000,
                                       subsample=0.5,
@@ -109,6 +111,8 @@ model_xgb = xgb.XGBClassifier(learning_rate=0.1,
 #eval_metric='auc' which means that while the model is being trained it will be evaluated using area under the curve as a metric
 #verbosity=1 means print out the log
 
+
+
 #evaluation data set ------------
 eval_set = [(X_valid, y_valid)]
 
@@ -123,6 +127,7 @@ model_xgb.fit(X_train,
 #which means no new tree will be built if the model performance does not change for 10 iterations
 
 #Evaluate the performance -------------------------------------------------------------------------
+'''
 #Get probability of preditions for every observation that that has been supplied to it
 y_train_pred = model_xgb.predict_proba(X_train)[:,1]
 y_valid_pred = model_xgb.predict_proba(X_valid)[:,1]
@@ -139,12 +144,15 @@ print("AUC Train: {:.4f}\nAUC Valid: {:.4f}".format(roc_auc_score(y_train, y_tra
 #y_valid_bkg_pred = model_xgboost.predict_proba(X_valid)[:,0]
 #print("AUC Train(bkg): {:.4f}\nAUC Valid(bkg): {:.4f}".format(roc_auc_score(y_train, y_train_bkg_pred),
 #                                                    roc_auc_score(y_valid, y_valid_bkg_pred)))
+'''
 
 #Feature importance -----------------------------------------------------------------
-xgb.plot_importance(model_xgb.get_booster())
+xgb.plot_importance(model_xgb.get_booster(),grid=False)
+plt.subplots_adjust(left=0.212, right=0.943)
+#plt.show()
 plt.savefig("importance_plot_prebuilt_model_.pdf")
 #plot_importance is based on matplotlib, so the plot can be saved use plt.savefig()
-print('feature_names',feature_names)
+#print('feature_names',feature_names)
 
 
 evaluation_results_model_xgb = model_xgb.evals_result()
@@ -168,14 +176,51 @@ plt.savefig('xgboost_AUC_train_tree_num_prebuilt.png')
 #Save model
 model_xgb.save_model("xgb_prebuilt.model")
 
-# Basic info of the data set -------------------------
+# Basic info of the data set ------------------------------
 n_s=len(train_data[train_data.tag==1])
 n_b=len(train_data[train_data.tag!=1])
-n_all=(float)(n_s+n_b)
-frac_s=n_s/n_all
+n_b_el=len(train_data[train_data.tag==2])
+n_b_midp=len(train_data[train_data.tag==5])
 
-print('Number of signal events: {}'.format(n_s))
+n_all=(float)(n_s+n_b)
+
+frac_s=n_s/n_all
+frac_el=n_b_el/n_all
+frac_midp=n_b_midp/n_all
+
+print('Number of signal (inel.) events: {}'.format(n_s))
 print('Number of background events: {}'.format(n_b))
 print('Fraction signal: {}'.format(frac_s))
 
+print('Fraction bkg (el): {}'.format(frac_el))
+print('Fraction bkg (misidp): {}'.format(frac_midp))
+
+#Predic results -----------------------------------------------------------------------------------------
+#print(model_xgb.evals_result())
+predictions = model_xgb.predict(X_valid)
+print(predictions)
+
+
+# plot all predictions (both signal and background)
+plt.figure();
+plt.hist(predictions,bins=np.linspace(0,1,50),histtype='step',color='darkgreen',label='All events', log=False);
+# make the plot readable
+plt.xlabel('Prediction from BDT',fontsize=12);
+plt.ylabel('Events',fontsize=12);
+plt.legend(frameon=False);
+plt.savefig('BDT_predict.png')
+
+'''
+# plot signal and background separately
+plt.figure();
+plt.hist(predictions[X_valid.get_label().astype(bool)],bins=np.linspace(0,1,50),
+         histtype='step',color='midnightblue',label='signal');
+plt.hist(predictions[~(X_valid.get_label().astype(bool))],bins=np.linspace(0,1,50),
+         histtype='step',color='firebrick',label='background');
+# make the plot readable
+plt.xlabel('Prediction from BDT',fontsize=12);
+plt.ylabel('Events',fontsize=12);
+plt.legend(frameon=False);
+plt.savefig('BDT_predict.png')
+'''
 
