@@ -59,7 +59,7 @@ print(train_data.head(3))
 #train_data.info()
 #train_data.describe()
 
-#rename header ---------------------
+#rename header -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #train_data2=train_data.rename(columns={'tag':'tag', 'ntrklen':'0', 'trklen':'1', 'PID':'2', 'B':'3', 'costheta':'4', 'mediandedx':'5', 'endpointdedx':'6', 'calo':'7', 'avcalo':'8'}, axis=1, inplace=True)
 #print(train_data2.head(3))
 
@@ -67,6 +67,7 @@ print(train_data.head(3))
 frac_split=0.5
 n_s=len(train_data[train_data.tag==1])
 n_b=len(train_data[train_data.tag!=1])
+
 n_b_el=len(train_data[train_data.tag==2])
 n_b_midp=len(train_data[train_data.tag==5])
 n_all=(float)(n_s+n_b)
@@ -86,11 +87,11 @@ print('Fraction bkg (misidp): {}'.format(frac_midp))
 
 print('N_split: {}'.format(n_split))
 
-
 #Split the columns into 'target(1:signal 0:background)' and the varable columns for training --
 var_colums=[c for c in train_data.columns if c not in ['train','tag','target']]
 X=train_data.loc[:, var_colums]
 y=train_data.loc[:, 'target']
+z=train_data.loc[:, 'tag']
 feature_names = var_colums
 
 print(X.head(3))
@@ -99,10 +100,19 @@ print(y.head(3))
 #split the whole data set into train and test set using 'train_test_split' function in sklearn -----------------------------------------
 #test_size=percentage of events to be used for validation
 split_frac=0.4
-X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=split_frac)
+#X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=split_frac)
+X_train, X_valid, z_train, z_valid = train_test_split(X, z, test_size=split_frac)
 #[Note]'train_test_split' will convert the dataframe to numpy array which dont have columns information anymore(ie, no feature names).
 
-print('Dimensions:',X_train.shape, X_valid.shape, y_train.shape, y_valid.shape)
+#replace badground tags to value 0 -----------
+#We still want to preserve the original tags
+y_train=z_train.replace([2,3,4,5,6,7,8], 0)           
+y_valid=z_valid.replace([2,3,4,5,6,7,8], 0)
+
+print(z_valid.head(10))
+print(y_valid.head(10))
+
+print('Dimensions:',X_train.shape, X_valid.shape, y_train.shape, y_valid.shape, z_valid.shape)
 print('Number of training samples: {}'.format(len(X_train)))
 print('Number of cross-validation samples: {}'.format(len(X_valid)))
 
@@ -197,7 +207,6 @@ plt.legend(frameon=False,loc='center right')
 #plt.show()
 plt.savefig('xgb_1_AUC_train_tree_num_prebuilt.eps')
 
-
 #Predict results ---------------------------------------------------------------------------------------------------
 results=model_xgb.evals_result()
 #print(results)
@@ -278,6 +287,8 @@ bdt_cut=0.5
 #select inel. events based on the BDT_score cut (in DataFrame)
 XY_valid_inel=XY_valid.loc[XY_valid['bdt_score']>bdt_cut]
 print(XY_valid_inel.head(3))
+
+#Old evt selection cut using PID
 XY_valid_inel_old=XY_valid.loc[XY_valid['PID']>10]
 
 #2D scatter plot -----------------------------------------------------------------------------------
@@ -321,6 +332,5 @@ print('Number of background events: {}'.format(nvalid_b_true))
 #print('Number of all events: {}'.format(n_all))
 print('Purity of new bdt cut: {}'.format(frac_bdt))
 print('Purity of old chi2 cut: {}'.format(frac_old))
-
 
 
