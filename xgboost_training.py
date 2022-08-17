@@ -5,6 +5,7 @@ import pandas as pd
 import xgboost as xgb
 #from xgboost import XGBClassifier # Or XGBRegressor for Logistic Regression
 from xgboost import XGBRegressor # Or XGBClassifier for Classification
+from xgboost import plot_tree
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_auc_score
@@ -31,6 +32,7 @@ import copy
 #pip install seaborn
 #pip install sklearn
 #pip install xgboost==1.0.1
+#pip install graphviz
 
 # using Pandas.DataFrame data-format, other available format are XGBoost's DMatrix and numpy.ndarray
 
@@ -109,8 +111,8 @@ X_train, X_valid, z_train, z_valid = train_test_split(X, z, test_size=split_frac
 y_train=z_train.replace([2,3,4,5,6,7,8], 0)           
 y_valid=z_valid.replace([2,3,4,5,6,7,8], 0)
 
-print(z_valid.head(10))
-print(y_valid.head(10))
+#print(z_valid.head(10))
+#print(y_valid.head(10))
 
 print('Dimensions:',X_train.shape, X_valid.shape, y_train.shape, y_valid.shape, z_valid.shape)
 print('Number of training samples: {}'.format(len(X_train)))
@@ -242,6 +244,10 @@ print(y_valid.head(3))
 print(XY_valid.head(3))
 print('Dimensions of y_valid:',y_valid.shape)
 
+# plot single tree ------------------------------
+plot_tree(model_xgb, num_trees=0, rankdir='LR')
+#plt.show()
+plt.savefig('xgb_4_Decision_trees.eps')
 
 # plot BDT score ----- ---------------------------------------------------------------------------------------------- 
 plt.figure()
@@ -279,6 +285,9 @@ plt.hist(bdt_b,bins=np.linspace(bdt_min,bdt_max,n_bdt),histtype='step',color='re
 #plt.ylabel('Events',fontsize=12)
 plt.legend(loc='upper center', frameon=False)
 plt.savefig('xgb_2_BDT_predict.eps')
+
+
+
 
 #Use BDT score to select inelastic-scattering events ---------------------
 #evt selection cuts
