@@ -218,7 +218,7 @@ print('type of predictions:',type(predictions))
 # Add newly-produced BDT score to validation set ----------
 print('Dimensions of X_valid:',X_valid.shape)
 print(X_valid.head(3))
-bdt_score=['bdt_score', y_pred]
+#bdt_score=['bdt_score', y_pred]
 #print('Dimensions of bdt_score:', np.shape(bdt_score))
 
 #Merge all info for valid set
@@ -234,7 +234,7 @@ print(XY_valid.head(3))
 print('Dimensions of y_valid:',y_valid.shape)
 
 
-# plot all predictions ------------------------------------------------------------------------------------------ 
+# plot BDT score ----- ---------------------------------------------------------------------------------------------- 
 plt.figure()
 n_bdt=100
 bdt_min=0
@@ -274,6 +274,8 @@ plt.savefig('xgb_2_BDT_predict.eps')
 #Use BDT score to select inelastic-scattering events ---------------------
 #evt selection cuts
 bdt_cut=0.5
+
+#select inel. events based on the BDT_score cut (in DataFrame)
 XY_valid_inel=XY_valid.loc[XY_valid['bdt_score']>bdt_cut]
 print(XY_valid_inel.head(3))
 XY_valid_inel_old=XY_valid.loc[XY_valid['PID']>10]
@@ -284,8 +286,8 @@ y_pid=XY_valid_inel.loc[:, 'PID']
 
 plt.figure(figsize = (12,9))
 plt.title("Event Selection of Inelastic-scattering Protons") 
-plt.plot(XY_valid.loc[:, 'ntrklen'], XY_valid.loc[:, 'PID'],'ko', markersize=1, label='All events')
-plt.plot(x_ntrklen,y_pid,'ro', markersize=1, label='After event selection')
+plt.plot(XY_valid.loc[:, 'ntrklen'], XY_valid.loc[:, 'PID'], 'ko', markersize=1, label='All events')
+plt.plot(x_ntrklen, y_pid,'ro', markersize=1, label='After event selection')
 plt.xlim(0, 1.3)
 plt.ylim(-.5, 250)
 

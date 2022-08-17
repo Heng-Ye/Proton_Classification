@@ -267,7 +267,9 @@ void ProtonNewTreeMaker::Loop() {
 	//TString str_out=Form("protons.root");
 	//TString str_out=Form("protons_b2.root");
 	//TString str_out=Form("protons_mva.root");
-	TString str_out=Form("protons_mva2.root");
+	//
+	//TString str_out=Form("protons_mva2.root");
+	TString str_out=Form("protons_nobeamxy_mva2.root");
 
   	TFile *hfile =new TFile(str_out.Data(),"RECREATE");
 	TTree *tree = new TTree("tr","signal");
@@ -972,7 +974,8 @@ void ProtonNewTreeMaker::Loop() {
 		//save three here
 		//if (!isTestSample&&kinel&&IsBeamXY&&IsPandoraSlice&&IsCaloSize&&IsBQ) {  //train, basic cuts
 		//if (isTestSample&&kinel&&IsBeamXY&&IsPandoraSlice&&IsCaloSize&&IsBQ) {  //test, basic cuts
-		if (IsBeamXY&&IsPandoraSlice&&IsCaloSize&&IsBQ) {  //test, basic cuts
+		//if (IsBeamXY&&IsPandoraSlice&&IsCaloSize&&IsBQ) {  //test, basic cuts
+		if (IsPandoraSlice&&IsCaloSize&&IsBQ) {  //test, basic cuts
 			tree->Fill();
 		} //basic cuts
 
