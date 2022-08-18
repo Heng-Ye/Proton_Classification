@@ -19,6 +19,9 @@ import mplhep as hep
 import csv
 import copy
 
+import time
+from datetime import timedelta
+
 #import xgboost
 #print(xgboost.__version__)
 
@@ -40,6 +43,9 @@ import copy
 hep.style.use("CMS") # string aliases work too
 #hep.style.use(hep.style.ROOT)
 #hep.style.use(hep.style.ATLAS)
+
+#start_time
+start_time = time.monotonic()
 
 #read train and test csv --------------------------------------------------------------------------------
 #train_data = pd.read_csv("protons_mva2_train.csv", sep='\t') #use \t to separate
@@ -240,9 +246,11 @@ print('Dimensions of y_pred:',y_pred.shape)
 print('Dimensions of XY_valid:',XY_valid.shape)
 
 XY_valid.insert(1, "target", y_valid, True)
+XY_valid.insert(2, "tag", z_valid, True)
 print(y_valid.head(3))
 print(XY_valid.head(3))
 print('Dimensions of y_valid:',y_valid.shape)
+print('Dimensions of XY_valid:',XY_valid.shape)
 
 # plot single tree ------------------------------
 plot_tree(model_xgb, num_trees=0, rankdir='LR')
@@ -287,8 +295,6 @@ plt.legend(loc='upper center', frameon=False)
 plt.savefig('xgb_2_BDT_predict.eps')
 
 
-
-
 #Use BDT score to select inelastic-scattering events ---------------------
 #evt selection cuts
 bdt_cut=0.5
@@ -300,23 +306,34 @@ print(XY_valid_inel.head(3))
 #Old evt selection cut using PID
 XY_valid_inel_old=XY_valid.loc[XY_valid['PID']>10]
 
-#2D scatter plot -----------------------------------------------------------------------------------
-x_ntrklen=XY_valid_inel.loc[:, 'ntrklen']
-y_pid=XY_valid_inel.loc[:, 'PID']
 
-plt.figure(figsize = (12,9))
-plt.title("Event Selection of Inelastic-scattering Protons") 
-plt.plot(XY_valid.loc[:, 'ntrklen'], XY_valid.loc[:, 'PID'], 'ko', markersize=1, label='All events')
-plt.plot(x_ntrklen, y_pid,'ro', markersize=1, label='After event selection')
-plt.xlim(0, 1.3)
-plt.ylim(-.5, 250)
+#statistics of old/new cuts -------------------------------------------------------------------------------
+#old PID cut
+nvalid_tot=len(XY_valid_inel_old)
+nvalid_inel=len(XY_valid_inel_old.loc[XY_valid_inel_old['tag']==1])
+nvalid_el=len(XY_valid_inel_old.loc[XY_valid_inel_old['tag']==2])
+nvalid_misidp=len(XY_valid_inel_old.loc[XY_valid_inel_old['tag']==5])
+nvalid_other=nvalid_tot-nvalid_inel-nvalid_el-nvalid_misidp
 
-plt.xlabel("Normalized Track Length [a.u.]")
-plt.ylabel("$\chi^{2}$ PID [a.u.]")
-plt.legend(frameon=True)
-plt.savefig('xgb_3_ntrklen_pid_inelcut.eps')
- 
-#statistics of old/new cuts
+frac_inel=(float)(nvalid_inel/nvalid_tot)
+frac_el=(float)(nvalid_el/nvalid_tot)
+frac_misidp=(float)(nvalid_misidp/nvalid_tot)
+frac_other=(float)(nvalid_other/nvalid_tot)
+
+#New BDT cut
+nnvalid_tot=len(XY_valid_inel)
+nnvalid_inel=len(XY_valid_inel.loc[XY_valid_inel['tag']==1])
+nnvalid_el=len(XY_valid_inel.loc[XY_valid_inel['tag']==2])
+nnvalid_misidp=len(XY_valid_inel.loc[XY_valid_inel['tag']==5])
+nnvalid_other=nnvalid_tot-nnvalid_inel-nnvalid_el-nnvalid_misidp
+
+ffrac_inel=(float)(nnvalid_inel/nnvalid_tot)
+ffrac_el=(float)(nnvalid_el/nnvalid_tot)
+ffrac_misidp=(float)(nnvalid_misidp/nnvalid_tot)
+ffrac_other=(float)(nnvalid_other/nnvalid_tot)
+
+
+'''
 nvalid_inel_bdt=len(XY_valid.loc[(XY_valid['bdt_score']>bdt_cut)&(XY_valid['target']==1)])
 nvalid_inel_old=len(XY_valid.loc[(XY_valid['PID']>10)&(XY_valid['target']==1)])
 
@@ -334,12 +351,169 @@ frac_old=nvalid_inel_old/nvalid_s_true
 #frac_el=n_b_el/n_all
 #frac_midp=n_b_midp/n_all
 #n_split=(int)(n_all*frac_split)
+'''
+print('==Old PID Cut ===================================================================')
+print('Number of all events: {}'.format(nvalid_tot))
+print('Number of inel events: {} ({:0.2f}%)'.format(nvalid_inel, 100.*frac_inel))
+print('Number of el events: {} ({:0.2f}%)'.format(nvalid_el, 100.*frac_el))
+print('Number of misid:p events: {} ({:0.2f}%)'.format(nvalid_misidp, 100.*frac_misidp))
+print('Number of other events: {} ({:0.2f}%)'.format(nvalid_other, 100.*frac_other))
+print('==After Cut ===================================================================')
+print('Number of all events: {}'.format(nnvalid_tot))
+print('Number of inel events: {} ({:0.2f}%)'.format(nnvalid_inel, 100.*ffrac_inel))
+print('Number of el events: {} ({:0.2f}%)'.format(nnvalid_el, 100.*ffrac_el))
+print('Number of misid:p events: {} ({:0.2f}%)'.format(nnvalid_misidp, 100.*ffrac_misidp))
+print('Number of other events: {} ({:0.2f}%)'.format(nnvalid_other, 100.*ffrac_other))
 
-print('Number of BDT (inel.) events: {}'.format(nvalid_inel_bdt))
-print('Number of true signal (inel.) events: {}'.format(nvalid_all_true))
-print('Number of background events: {}'.format(nvalid_b_true))
+
+
+#print('Number of BDT (inel.) events: {}'.format(nvalid_inel_bdt))
+#print('Number of true signal (inel.) events: {}'.format(nvalid_all_true))
+#print('Number of background events: {}'.format(nvalid_b_true))
 #print('Number of all events: {}'.format(n_all))
-print('Purity of new bdt cut: {}'.format(frac_bdt))
-print('Purity of old chi2 cut: {}'.format(frac_old))
+#print('Purity of new bdt cut: {}'.format(frac_bdt))
+#print('Purity of old chi2 cut: {}'.format(frac_old))
+
+
+#1D trklen distribution: before/after new/old cuts -------------------------------------------------------------------------------------------------------------
+#before cut ------------------------------------------------------------------------------------------------------------------------------------------------
+plt.figure()
+n_trklen=65
+trklen_min=0
+trklen_max=130
+bins_each=np.linspace(trklen_min,trklen_max,n_trklen)
+
+plt.figure(figsize = (12,9))
+plt.title("Validation Set")
+plt.hist(XY_valid.loc[:, 'trklen'], bins=np.linspace(trklen_min,trklen_max,n_trklen), histtype='step', stacked=False, color='black', label='All', log=False)
+
+plt.hist([\
+XY_valid[XY_valid.tag==1].loc[:, 'trklen'],\
+XY_valid[XY_valid.tag==2].loc[:, 'trklen'], \
+XY_valid[XY_valid.tag==5].loc[:, 'trklen'], \
+XY_valid.query('(tag!=1) & (tag!=2) & (tag!=5)').loc[:,'trklen']\
+],
+ bins_each, \
+ histtype='stepfilled', \
+ stacked=True, \
+ label=['Inel.','El.','MisID:P','Others'],\
+ color=['red','blue','green','yellow'],
+ log=False)
+
+#get handles and labels
+handles, labels = plt.gca().get_legend_handles_labels()
+
+#specify order of items in legend
+order = [0,4,3,2,1]
+
+#add legend to plot
+plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order],loc='upper left', frameon=True)
+plt.ylim(0, 1000)
+plt.xlabel("Track Length [cm]")
+plt.ylabel("Events")
+plt.savefig('xgb_5_trklen_beforecut.eps')
+
+#after cut ------------------------------------------------------------------------------------------------------------------------------------------------------------
+#PID cut ----------------------------------------------------------------------------------------------------------------------------------------------------
+plt.figure()
+plt.figure(figsize = (12,9))
+plt.title("Validation Set with $\chi^{2}$PID Cut")
+plt.hist(XY_valid.loc[:, 'trklen'], bins=np.linspace(trklen_min,trklen_max,n_trklen), histtype='step', stacked=False, color='black', label='All', log=False)
+
+plt.hist([\
+XY_valid_inel_old[XY_valid_inel_old.tag==1].loc[:, 'trklen'],\
+XY_valid_inel_old[XY_valid_inel_old.tag==2].loc[:, 'trklen'], \
+XY_valid_inel_old[XY_valid_inel_old.tag==5].loc[:, 'trklen'], \
+XY_valid_inel_old.query('(tag!=1) & (tag!=2) & (tag!=5)').loc[:,'trklen']\
+],
+ bins_each, \
+ histtype='stepfilled', \
+ stacked=True, \
+ label=['Inel. ({:0.1f}%)'.format(100.*frac_inel),'El. ({:0.1f}%)'.format(100.*frac_el),'MisID:P ({:0.1f}%)'.format(100.*frac_misidp),'Others ({:0.2f}%)'.format(100.*frac_other)],\
+ color=['red','blue','green','yellow'],
+ log=False)
+
+#get handles and labels
+handles, labels = plt.gca().get_legend_handles_labels()
+
+#specify order of items in legend
+order = [0,4,3,2,1]
+
+#add legend to plot
+plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order],loc='upper left', frameon=True)
+plt.ylim(0, 1000)
+plt.xlabel("Track Length [cm]")
+plt.ylabel("Events")
+plt.savefig('xgb_6_trklen_aftercut_PID.eps')
+
+#BDT cut
+plt.figure()
+plt.figure(figsize = (12,9))
+plt.title("Validation Set with BDT Cut")
+plt.hist(XY_valid.loc[:, 'trklen'], bins=np.linspace(trklen_min,trklen_max,n_trklen), histtype='step', stacked=False, color='black', label='All', log=False)
+
+plt.hist([\
+XY_valid_inel[XY_valid_inel.tag==1].loc[:, 'trklen'],\
+XY_valid_inel[XY_valid_inel.tag==2].loc[:, 'trklen'], \
+XY_valid_inel[XY_valid_inel.tag==5].loc[:, 'trklen'], \
+XY_valid_inel.query('(tag!=1) & (tag!=2) & (tag!=5)').loc[:,'trklen']\
+],
+ bins_each, \
+ histtype='stepfilled', \
+ stacked=True, \
+ label=['Inel. ({:0.1f}%)'.format(100.*ffrac_inel),'El. ({:0.1f}%)'.format(100.*ffrac_el),'MisID:P ({:0.1f}%)'.format(100.*ffrac_misidp),'Others ({:0.2f}%)'.format(100.*ffrac_other)],\
+ color=['red','blue','green','yellow'],
+ log=False)
+
+#get handles and labels
+handles, labels = plt.gca().get_legend_handles_labels()
+
+#specify order of items in legend
+order = [0,4,3,2,1]
+
+#add legend to plot
+plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order],loc='upper left', frameon=True)
+plt.ylim(0, 1000)
+plt.xlabel("Track Length [cm]")
+plt.ylabel("Events")
+plt.savefig('xgb_7_trklen_aftercut_BDT.eps')
+
+
+
+
+#2D scatter plot -----------------------------------------------------------------------------------
+x_ntrklen=XY_valid_inel.loc[:, 'ntrklen']
+y_pid=XY_valid_inel.loc[:, 'PID']
+
+plt.figure(figsize = (12,9))
+plt.title("Event Selection of Inelastic-scattering Protons") 
+plt.plot(XY_valid.loc[:, 'ntrklen'], XY_valid.loc[:, 'PID'], 'ko', markersize=1, label='All events')
+plt.plot(x_ntrklen, y_pid,'ro', markersize=1, label='After event selection')
+plt.xlim(0, 1.3)
+plt.ylim(-.5, 250)
+
+plt.xlabel("Normalized Track Length [a.u.]")
+plt.ylabel("$\chi^{2}$ PID [a.u.]")
+plt.legend(frameon=True)
+plt.savefig('xgb_3_ntrklen_pid_inelcut.eps')
+ 
+
+plt.figure(figsize = (12,9))
+plt.title("Basic Cuts") 
+plt.plot(XY_valid.loc[:, 'ntrklen'], XY_valid.loc[:, 'PID'], 'ko', markersize=1, label='All events')
+plt.xlim(0, 1.3)
+plt.ylim(-.5, 250)
+
+plt.xlabel("Normalized Track Length [a.u.]")
+plt.ylabel("$\chi^{2}$ PID [a.u.]")
+plt.legend(frameon=True)
+plt.savefig('xgb_3_ntrklen_pid_nocut.eps')
+
+
+
+
+
+end_time = time.monotonic()
+print('Time spent of the code:', timedelta(seconds=end_time - start_time), " sec")
 
 
