@@ -257,10 +257,25 @@ void ProtonNewTreeMaker::Loop() {
 	Float_t endpointdedx=-999;
 	Float_t calo=-1;
 	Float_t avcalo=-1;
+	
+	Float_t st_x=-999;
+	Float_t st_y=-999;
+	Float_t st_z=-999;
+	Float_t end_x=-999;
+	Float_t end_y=-999;
+	Float_t end_z=-999;
+
+	Float_t pbdt=-999;
+	
+
+
+	
+	//daughter info
+	Int_t nd=0; //num of daughters
 
 	//Double_t cos;
 
-	//Tree Structures -----------------------------------//
+	//Tree Structures --------------------------------------------//
 	//TString str_out=Form("signal.root");
 	//TString str_out=Form("signal_train.root");
 	//TString str_out=Form("signal_test.root");
@@ -269,7 +284,8 @@ void ProtonNewTreeMaker::Loop() {
 	//TString str_out=Form("protons_mva.root");
 	//
 	//TString str_out=Form("protons_mva2.root");
-	TString str_out=Form("protons_nobeamxy_mva2.root");
+	//TString str_out=Form("protons_nobeamxy_mva2.root");
+	TString str_out=Form("protons_with_additionalinfo_mva2.root");
 
   	TFile *hfile =new TFile(str_out.Data(),"RECREATE");
 	TTree *tree = new TTree("tr","signal");
@@ -284,6 +300,16 @@ void ProtonNewTreeMaker::Loop() {
    	tree->Branch("endpointdedx", &endpointdedx, "endpointdedx/F");
    	tree->Branch("calo", &calo, "calo/F");
    	tree->Branch("avcalo", &avcalo, "avcalo/F");
+   	tree->Branch("st_x", &st_x, "st_x/F");
+   	tree->Branch("st_y", &st_x, "st_y/F");
+   	tree->Branch("st_z", &st_x, "st_z/F");
+   	tree->Branch("end_x", &st_x, "end_x/F");
+   	tree->Branch("end_y", &st_x, "end_y/F");
+   	tree->Branch("end_z", &st_x, "end_z/F");
+   	tree->Branch("pbdt", &pbdt, "pbdt/F");
+
+   	tree->Branch("nd", &nd, "nd/I");
+
 
 	//Name of output file ------------------------------------------------------------------------------------------------------------//
 
@@ -658,6 +684,14 @@ void ProtonNewTreeMaker::Loop() {
 			reco_endy=primtrk_hity->at(primtrk_dedx->size()-1);
 			reco_endz=primtrk_hitz->at(primtrk_dedx->size()-1);
 
+			st_x=reco_stx;
+			st_y=reco_sty;
+			st_z=reco_stz;
+			end_x=reco_endx;
+			end_y=reco_endy;
+			end_z=reco_endz;
+			
+
 			//reco_startX_sce->Fill(reco_stx);
 			//reco_startY_sce->Fill(reco_sty);
 			//reco_startZ_sce->Fill(reco_stz);
@@ -916,6 +950,54 @@ void ProtonNewTreeMaker::Loop() {
 		//double KEbb_true=-1; KEbb_true=KE_ff-BB.KEAtLength(KE_ff, range_true);
 		//double KEbb_reco=-1; KEbb_reco=KE_ff-BB.KEAtLength(KE_ff, range_reco);
 		//---------------------------------------------------------------------------------------------------------------//
+
+		//additional info -------------------------------------------------------------------------------------//
+		pbdt=primaryBDTScore;
+		nd=NDAUGHTERS;
+
+		//if (NDAUGHTERS==0) {
+			//if (tag==1||tag==2||tag==5) {
+			//std::cout<<"tag:"<<tag<<" range_reco:"<<range_reco<<std::endl;
+			//std::cout<<"primaryBDTScore:"<<primaryBDTScore<<std::endl;
+			//std::cout<<"primaryOpeningAngle:"<<primaryOpeningAngle<<std::endl; //-999
+			//std::cout<<"NDAUGHTERS:"<<NDAUGHTERS<<std::endl;
+			//}
+			//for (int di=0; di<16; ++di) {
+				//if (daughterMomentum[di]>0) {
+					//std::cout<<"daughterMomentum["<<di<<"]="<<daughterMomentum[di]<<std::endl; //not useful it seems
+					//std::cout<<"daughterEndMomentum["<<di<<"]="<<daughterEndMomentum[di]<<endl; //not useful it seems
+					//std::cout<<"daughterLength["<<di<<"]="<<daughterLength[di]<<std::endl;
+					//std::cout<<"daughterEndPosition["<<di<<"][0]"<<daughterEndPosition[di][0]<<endl;
+					//std::cout<<"daughterEndPosition["<<di<<"][1]"<<daughterEndPosition[di][1]<<endl;
+					//std::cout<<"daughterEndPosition["<<di<<"][2]"<<daughterEndPosition[di][2]<<endl;
+					//std::cout<<"daughterStartPosition["<<di<<"][0]"<<daughterStartPosition[di][0]<<endl;
+					//std::cout<<"daughterStartPosition["<<di<<"][1]"<<daughterStartPosition[di][1]<<endl;
+					//std::cout<<"daughterStartPosition["<<di<<"][2]"<<daughterStartPosition[di][2]<<endl;
+					//std::cout<<"daughterStartDirection["<<di<<"][0]"<<daughterStartDirection[di][0]<<endl;
+					//std::cout<<"daughterStartDirection["<<di<<"][1]"<<daughterStartDirection[di][1]<<endl;
+					//std::cout<<"daughterStartDirection["<<di<<"][2]"<<daughterStartDirection[di][2]<<endl;
+					//std::cout<<"daughterEndDirection["<<di<<"][0]"<<daughterEndDirection[di][0]<<endl;
+					//std::cout<<"daughterEndDirection["<<di<<"][1]"<<daughterEndDirection[di][1]<<endl;
+					//std::cout<<"daughterEndDirection["<<di<<"][2]"<<daughterEndDirection[di][2]<<endl;
+					//std::cout<<"daughterOpeningAngle["<<di<<"]="<<daughterOpeningAngle[di]<<endl;
+					//std::cout<<"daughterShowerEnergy["<<di<<"]="<<daughterShowerEnergy[di]<<endl; //-999
+					//std::cout<<"daughterShowerMIPEnergy["<<di<<"]="<<daughterShowerMIPEnergy[di]<<endl; //not useful, -999
+					//std::cout<<"daughterShowerdEdx["<<di<<"]="<<daughterShowerdEdx[di]<<endl; //-999
+					//std::cout<<"daughterMomentumByRangeProton["<<di<<"]="<<daughterMomentumByRangeProton[di]<<endl; //-999
+					//std::cout<<"daughterMomentumByRangeMuon["<<di<<"]="<<daughterMomentumByRangeMuon[di]<<endl;
+					//std::cout<<"daughterKineticEnergy["<<di<<"][0]="<<daughterKineticEnergy[di][0]<<endl;
+					//std::cout<<"daughterKineticEnergy["<<di<<"][1]="<<daughterKineticEnergy[di][1]<<endl;
+					//std::cout<<"daughterKineticEnergy["<<di<<"][2]="<<daughterKineticEnergy[di][2]<<endl;
+
+				//}
+			//}
+			//std::cout<<"\n"<<std::endl;
+		//}
+
+
+
+
+
 
 		//bmrw -------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 		double mom_rw_minchi2=1; //weight for beam-momentum-reweight
