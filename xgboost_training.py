@@ -8,7 +8,7 @@ from xgboost import XGBRegressor # Or XGBClassifier for Classification
 from xgboost import plot_tree
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score,roc_curve,auc
 from sklearn.model_selection import GridSearchCV
 
 import matplotlib.pyplot as plt
@@ -55,7 +55,9 @@ start_time = time.monotonic()
 #train_data = pd.read_csv("protons_mva2_train.csv",usecols=['ntrklen']) # Only reads 'ntrklen' 
 #train_data = pd.read_csv("protons_mva2_train.csv", sep=',', header=None, skiprows=1) #skip the top row 
 #train_data = pd.read_csv("protons_mva2_train.csv", sep=',', header=None)
+
 train_data = pd.read_csv('protons_mva2.csv') #read all data
+#train_data = pd.read_csv('protons_with_additionalinfo_mva2.csv') #read all data
 #test_data = pd.read_csv('protons_mva2_test.csv')
 #X, y = train_data.iloc[:,:-1],train_data.iloc[:,-1]
 
@@ -97,6 +99,7 @@ print('N_split: {}'.format(n_split))
 
 #Split the columns into 'target(1:signal 0:background)' and the varable columns for training --
 var_colums=[c for c in train_data.columns if c not in ['train','tag','target']]
+#var_colums=[c for c in train_data.columns if c not in ['train','tag','target','st_x','st_y','st_z','end_x','end_y','end_z','pbdt','nd']]
 X=train_data.loc[:, var_colums]
 y=train_data.loc[:, 'target']
 z=train_data.loc[:, 'tag']
@@ -256,6 +259,27 @@ print('Dimensions of XY_valid:',XY_valid.shape)
 plot_tree(model_xgb, num_trees=0, rankdir='LR')
 #plt.show()
 plt.savefig('xgb_4_Decision_trees.eps')
+
+
+
+# ROC and AUC should be obtained on test set ----------------------------------------
+fpr, tpr, _ = roc_curve(y_valid, y_pred)
+roc_auc = auc(fpr, tpr)
+
+plt.figure()
+lw = 2
+plt.plot(fpr, tpr, color='red',
+         lw=lw, label='ROC curve (area = %0.2f)' % roc_auc)
+plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic')
+plt.legend(loc="lower right")
+# plt.show() # display the figure when not using jupyter display
+plt.savefig("xgb_4_roc.eps") # resulting plot is shown below
+
 
 # plot BDT score ----- ---------------------------------------------------------------------------------------------- 
 plt.figure()
@@ -510,8 +534,67 @@ plt.legend(frameon=True)
 plt.savefig('xgb_3_ntrklen_pid_nocut.eps')
 
 
+#2D scatter plot with truth labels ----------------------------------------------------------------------------------------------------------------
+#ntrklen vs pid
+plt.figure()
+plt.figure(figsize = (12,9))
+plt.title("Event Selection with BDT Cut") 
+#plt.plot(x_ntrklen, y_pid,'ro', markersize=1, label='After event selection')
+
+#plt.plot(XY_valid.loc[:, 'ntrklen'], XY_valid.loc[:, 'PID'], 'ko', markersize=1, label='All events')
+
+plt.plot(XY_valid_inel[XY_valid_inel.tag==1].loc[:,'ntrklen'], XY_valid_inel[XY_valid_inel.tag==1].loc[:,'PID'], 'ro', markersize=1, label='Inel.')
+plt.plot(XY_valid_inel[XY_valid_inel.tag==2].loc[:,'ntrklen'], XY_valid_inel[XY_valid_inel.tag==2].loc[:,'PID'], 'bo', color='blue', markersize=4, label='El.')
+plt.plot(XY_valid_inel[XY_valid_inel.tag==5].loc[:,'ntrklen'], XY_valid_inel[XY_valid_inel.tag==5].loc[:,'PID'], 'go', color='green', markersize=4, label='MisID:P')
+
+plt.xlabel("Normalized Track Length [a.u.]")
+plt.ylabel("$\chi^{2}$ PID [a.u.]")
+
+plt.xlim(0, 1.3)
+plt.ylim(-.5, 250)
+plt.legend(frameon=True,loc='upper right')
+plt.savefig('xgb_3_ntrklen_pid_BDTcut.eps')
+
+#trklen vs pid
+plt.figure()
+plt.figure(figsize = (12,9))
+plt.title("Event Selection with BDT Cut") 
+#plt.plot(x_ntrklen, y_pid,'ro', markersize=1, label='After event selection')
+
+#plt.plot(XY_valid.loc[:, 'ntrklen'], XY_valid.loc[:, 'PID'], 'ko', markersize=1, label='All events')
+
+plt.plot(XY_valid_inel[XY_valid_inel.tag==1].loc[:,'trklen'], XY_valid_inel[XY_valid_inel.tag==1].loc[:,'PID'], 'ro', markersize=1, label='Inel.')
+plt.plot(XY_valid_inel[XY_valid_inel.tag==2].loc[:,'trklen'], XY_valid_inel[XY_valid_inel.tag==2].loc[:,'PID'], 'bo', color='blue', markersize=4, label='El.')
+plt.plot(XY_valid_inel[XY_valid_inel.tag==5].loc[:,'trklen'], XY_valid_inel[XY_valid_inel.tag==5].loc[:,'PID'], 'go', color='green', markersize=4, label='MisID:P')
+
+plt.xlabel("Track Length [a.u.]")
+plt.ylabel("$\chi^{2}$ PID [a.u.]")
+
+plt.xlim(0, 120)
+plt.ylim(-.5, 250)
+plt.legend(frameon=True,loc='upper right')
+plt.savefig('xgb_3_trklen_pid_BDTcut.eps')
 
 
+#B vs pid
+plt.figure()
+plt.figure(figsize = (12,9))
+plt.title("Event Selection with BDT Cut") 
+#plt.plot(x_ntrklen, y_pid,'ro', markersize=1, label='After event selection')
+
+#plt.plot(XY_valid.loc[:, 'ntrklen'], XY_valid.loc[:, 'PID'], 'ko', markersize=1, label='All events')
+
+plt.plot(XY_valid_inel[XY_valid_inel.tag==1].loc[:,'B'], XY_valid_inel[XY_valid_inel.tag==1].loc[:,'PID'], 'ro', markersize=1, label='Inel.')
+plt.plot(XY_valid_inel[XY_valid_inel.tag==2].loc[:,'B'], XY_valid_inel[XY_valid_inel.tag==2].loc[:,'PID'], 'bo', color='blue', markersize=4, label='El.')
+plt.plot(XY_valid_inel[XY_valid_inel.tag==5].loc[:,'B'], XY_valid_inel[XY_valid_inel.tag==5].loc[:,'PID'], 'go', color='green', markersize=4, label='MisID:P')
+
+plt.xlabel("Impact Parameter [cm]")
+plt.ylabel("$\chi^{2}$ PID [a.u.]")
+
+plt.xlim(0, 20)
+plt.ylim(-.5, 250)
+plt.legend(frameon=True,loc='upper right')
+plt.savefig('xgb_3_B_PID_BDTcut.eps')
 
 end_time = time.monotonic()
 print('Time spent of the code:', timedelta(seconds=end_time - start_time), " sec")
