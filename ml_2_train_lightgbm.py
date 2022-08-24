@@ -93,7 +93,7 @@ model_lgbm.fit(X_train, y_train,
 
 
 #Save/output model ---------------------------------
-model_lgbm.save_model(output_file_name)
+model_lgbm.booster_.save_model(output_file_name)
 
 #Calculate time spent in the training process --------------------------------------
 end_time = time.monotonic()
