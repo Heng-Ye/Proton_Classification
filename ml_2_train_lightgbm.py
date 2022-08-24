@@ -3,7 +3,9 @@ from array import array
 import numpy as np
 import pandas as pd 
 import xgboost as xgb
-import lightgbm as lgbm
+import lightgbm as lgb
+from lightgbm import LGBMRegressor
+
 from sklearn import svm
 #from xgboost import XGBClassifier # Or XGBRegressor for Logistic Regression
 from xgboost import XGBRegressor # Or XGBClassifier for Classification
@@ -63,26 +65,32 @@ z_valid=pd.read_csv(input_file_name+'_z_valid.csv')
 feature_names=[c for c in X_train.columns if c not in ['train','tag','target']]
 
 #Build LightGBM Regression Model ----------------------------------------
-lgbm_train_data = lgbm.Dataset(X_train, label=y_train)
-lgbm_valid_data = lgbm.Dataset(X_valid, label=y_valid)
+#hyper parameters
+hyper_params = {
+    'task': 'train',
+    'boosting_type': 'gbdt',
+    'objective': 'regression',
+    #'metric': ['l1','l2'],
+    'metric': 'auc',	
+    'learning_rate': 0.005,
+    'feature_fraction': 0.9,
+    'bagging_fraction': 0.7,
+    'bagging_freq': 10,
+    'verbose': 0,
+    "max_depth": 8,
+    "num_leaves": 128,  
+    "max_bin": 512,
+    "num_iterations": 100000
+}
 
-parameters = {'objective': 'binary',
-              'metric': 'auc',
-              'is_unbalance': 'true',
-              'boosting': 'gbdt',
-              'num_leaves': 63,
-              'feature_fraction': 0.5,
-              'bagging_fraction': 0.5,
-              'bagging_freq': 20,
-              'learning_rate': 0.01,
-              'verbose': 0
-             }
 
-model_lgbm = lgbm.train(parameters,
-                            lgbm_train_data,
-                            valid_sets=lgbm_valid_data,
-                            num_boost_round=5000,
-                            early_stopping_rounds=50)
+lgbm = lgb.LGBMRegressor(**hyper_params)
+lgbm.fit(X_train, y_train,
+        eval_set=[(X_valid, y_valid)],
+        eval_metric='auc',
+        early_stopping_rounds=1000)
+
+
 
 #Save/output model ---------------------------------
 model_lgbm.save_model(output_file_name)
