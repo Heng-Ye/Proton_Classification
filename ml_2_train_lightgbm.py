@@ -84,8 +84,8 @@ hyper_params = {
 }
 
 
-lgbm = lgb.LGBMRegressor(**hyper_params)
-lgbm.fit(X_train, y_train,
+model_lgbm = lgb.LGBMRegressor(**hyper_params)
+model_lgbm.fit(X_train, y_train,
         eval_set=[(X_valid, y_valid)],
         eval_metric='auc',
         early_stopping_rounds=1000)
