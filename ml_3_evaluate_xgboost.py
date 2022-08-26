@@ -33,6 +33,7 @@ hep.style.use("CMS") # string aliases work too
 input_file_name='./data_prep/protons_mva2'
 output_file_name='./models/xgb.model'
 output_path='./plts_perform/'
+output_inel_csv='./csv/xgb_inel_valid.csv'
 
 X_train=pd.read_csv(input_file_name+'_X_train.csv')
 X_valid=pd.read_csv(input_file_name+'_X_valid.csv')
@@ -471,4 +472,6 @@ plt.ylim(-.5, 250)
 plt.legend(frameon=True,loc='upper right')
 plt.savefig(output_path+'xgb_11_B_PID_BDTcut.eps')
 
+#save validation file -----------------------------
+XY_valid_inel.to_csv(output_inel_csv, index=False)
 
