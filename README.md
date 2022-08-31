@@ -9,7 +9,7 @@ Framework:<br/>
 <br/>
 
 -**Regression using XGBoost, LightGBM**\
-├── (1) Data preparation code: ml_1_data_prep.py (Randomly divide data into training and validation(test) sets   
+├── (1) Data preparation code: ml_1_data_prep.py (Randomly divide data into training and validation(test) sets)   
 ├── (2) Training using modern models (XGBoost, LightGBM): ml_2_train_xgboost.py, ml_2_train_lightgbm.py \
 ├── (3) Performance evaluation code: ml_3_evaluate_xgboost.py, ml_3_evaluate_lightgbm.py           
 ├── (4) **Data visualization/Dimensionality reduction using UMAP**: ml_4_feature_visualization.py
