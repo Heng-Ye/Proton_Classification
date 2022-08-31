@@ -18,4 +18,3 @@ Code:<br/>
 -Use the trained results and apply on data\
 ├── Main code: **TMVAClassificationApplication.C**\
 ├── Run "./3_apply_cut.sh"
-
