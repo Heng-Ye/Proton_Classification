@@ -1,10 +1,21 @@
-# Proton Classification using Clustering/Regression/Deep Neural Network/MLP
+# Proton Event Selection using Advanced Machine Learning Classification/Regression Methods\
 
 Code:<br/>
 -Produce new tree for training\
 ├── Tree Maker: **ProtonNewTreeMakerX.C** \
 ├── Run "./1_create_tree.sh" to execute the code
+
+-Modern ML using XGBoost, LightGBM\
+├── (1)Data preparation code: ml_1_data_prep.py\
+|      (Randomly divide data into training and validation(test) sets    
+├── (2)Training using modern models (XGBoost, LightGBM):\
+|      ml_2_train_xgboost.py, ml_2_train_lightgbm.py\
+├── (3)Performance evaluation code:\
+|      ml_3_evaluate_xgboost.py, ml_3_evaluate_lightgbm.py\           
+├── (4)Data visualization/Dimensionality reduction using UMAP:\
+       ml_4_feature_visualization.py
  
+-Classical ML using KNN, SVM, MLP, Likelihood PCA, BoostedFisher, ...\ 
 -Run training process\
 ├── Training/classification code: **TMVAClassification.C** \
 ├── Choose the classification methods and execute the training process by "./2_run_training.sh" 
