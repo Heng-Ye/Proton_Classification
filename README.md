@@ -1,17 +1,18 @@
-# Proton Event Selection using Advanced Machine Learning Classification/Regression Methods\
+# Proton Event Selection using Advanced Machine Learning Classification/Regression Methods
 
-Code:<br/>
+Analysis structure:<br/>
 -Produce new tree for training\
-├── Tree Maker: **ProtonNewTreeMakerX.C** \
-├── Run "./1_create_tree.sh" to execute the code
+├── (1)Tree Maker: **ProtonNewTreeMakerX.C** \
+├── (2)Run "./1_create_tree.sh" to execute the code
+├── (3)Root-CSV conversion: **root2csv_converter.C**
 
--Modern ML using XGBoost, LightGBM\
+-**Modern ML using XGBoost, LightGBM**\
 ├── (1)Data preparation code: ml_1_data_prep.py\
-|      (Randomly divide data into training and validation(test) sets    
+├──    (Randomly divide data into training and validation(test) sets    
 ├── (2)Training using modern models (XGBoost, LightGBM):\
-|      ml_2_train_xgboost.py, ml_2_train_lightgbm.py\
+├──    ml_2_train_xgboost.py, ml_2_train_lightgbm.py\
 ├── (3)Performance evaluation code:\
-|      ml_3_evaluate_xgboost.py, ml_3_evaluate_lightgbm.py\           
+├──    ml_3_evaluate_xgboost.py, ml_3_evaluate_lightgbm.py\           
 ├── (4)Data visualization/Dimensionality reduction using UMAP:\
        ml_4_feature_visualization.py
  
