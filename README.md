@@ -23,7 +23,7 @@ Framework:<br/>
 
 <br/>
 
--Use TMVA GUI to see the trained results\
+-Use TMVA GUI to see the trained results, steps:\
 ├── Open the TMVA GUI by 'root -l'\
 ├── **TMVA::TMVAGui(**“TMVA.root”**)**\
 ├── Select "ROC" curve for the trained performance\
