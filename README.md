@@ -1,7 +1,7 @@
 # Proton Event Selection using Advanced Machine Learning Regression/Classification Methods
 
 Framework:<br/>
--Produce new tree for training\
+-Produce new tree for training and analysis\
 ├── (1) Tree Maker: **ProtonNewTreeMakerX.C** \
 ├── (2) Run "./1_create_tree.sh" to execute the code \
 ├── (3) Root-CSV conversion: **root2csv_converter.C** 
@@ -16,9 +16,9 @@ Framework:<br/>
 
 <br/>
 
--**ML Classification using KNN, SVM, MLP, Likelihood PCA, BoostedFisher (HEP-TMVA package)**  
+-**ML Classification using KNN, SVM, MLP, Likelihood PCA, BoostedFisher** (HEP-TMVA package)  
 -Run training process \
-├── Training/classification code: **TMVAClassification.C** 
+├── Training/classification code: **TMVAClassification.C** \
 ├── Choose the classification methods and execute the training process by "./2_run_training.sh" 
 
 <br/>
