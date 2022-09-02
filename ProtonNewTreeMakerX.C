@@ -330,7 +330,8 @@ void ProtonNewTreeMaker::Loop() {
 	//
 	//TString str_out=Form("protons_mva2.root");
 	//TString str_out=Form("protons_nobeamxy_mva2.root");
-	TString str_out=Form("protons_with_additionalinfo_mva2.root");
+	//TString str_out=Form("protons_with_additionalinfo_mva2.root");
+	TString str_out=Form("protons_mva2_2022_0902.root");
 
   	TFile *hfile =new TFile(str_out.Data(),"RECREATE");
 	TTree *tree = new TTree("tr","signal");
