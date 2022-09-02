@@ -239,9 +239,52 @@ void ProtonNewTreeMaker::Loop() {
 	} //mu loop
 
 
+	//const E-loss using stopping protons ---------
+	double Eloss_mc_hy_stop=19.542/0.998495;
+	//p[0]:19.542;   //err_p[0]:0.126113
+	//p[1]:0.998495; //err_p[1]:0.00549534
+
+	double R_fit_hy=1.0008142352819318;
+	double er_R_fit_hy=0.04629667706788889;
 
 
+	//const. E-loss assumption	
+	double const_eloss_mc=47.0058/1.00097; //const E-loss from fit (calo)
+	//#p[0]:47.0058 err_p[0]:0.372157 p[1]:-1.00097 err_p[1]:0.00787403
 
+	//New weighting func (using KEff_fit_stop at TPC FF as a reference) ------//
+	//double mu_denom_data=411.06602388610895; //old
+	//double sg_denom_data=47.075678784947826; //old
+
+	double mu_denom_data=411.05145837595467; //new with event-by-event R corr
+	double sg_denom_data=47.48714821962207; //new with event-by-event R corr
+
+	//double mu_nom_data=390.81237292943916; //for data (now use event-by-event correction)
+	//double sg_nom_data=47.52091718691363; //for data (now use event-by-event correction)
+
+	//double mu_nom_mc=388.560260293186; //for mc(KEbeam-const_from_calo)
+	//double sg_nom_mc=43.13168235197187; //formc
+
+	//double mu_nom_mc=416.224743039812; //for mc(KEbeam-const) with R=1 (R=Ratio of KEff(Fit)/(KEbeam-dE))
+	//double sg_nom_mc=42.786018962508784; //
+
+	double mu_nom_mc=416.1620092367158; //for mc [KE(Fit)]
+	double sg_nom_mc=40.48356757740762; //
+
+	//i= 0  m= 416.2247430398121 s= 42.786018962508784 [kebeam-dE]*1 (R=1)
+	//i= 1  m= 416.1620092367158 s= 40.48356757740762 [KE(Fit)] 
+
+	//weighting func. (ke)
+	TF1 *kerw=new TF1(Form("kerw"),govg,0,800,4);
+	kerw->SetParameter(0, mu_nom_mc);
+	kerw->SetParameter(1, sg_nom_mc);
+	kerw->SetParameter(2, mu_denom_data);
+	kerw->SetParameter(3, sg_denom_data);
+
+	//ke cut range	
+	double mu_kemin=mu_nom_mc-3.*sg_nom_mc;
+	double mu_kemax=mu_nom_mc+3.*sg_nom_mc;
+	//------------------------------------------------------------------------//
 
 
 
@@ -257,6 +300,8 @@ void ProtonNewTreeMaker::Loop() {
 	Float_t endpointdedx=-999;
 	Float_t calo=-1;
 	Float_t avcalo=-1;
+	Float_t keffbeam=-1;
+	Float_t kend_bb=-1;
 	
 	Float_t st_x=-999;
 	Float_t st_y=-999;
@@ -300,6 +345,8 @@ void ProtonNewTreeMaker::Loop() {
    	tree->Branch("endpointdedx", &endpointdedx, "endpointdedx/F");
    	tree->Branch("calo", &calo, "calo/F");
    	tree->Branch("avcalo", &avcalo, "avcalo/F");
+   	tree->Branch("keffbeam", &keffbeam, "keffbeam/F");
+   	tree->Branch("kend_bb", &kend_bb, "kend_bb/F");
    	tree->Branch("st_x", &st_x, "st_x/F");
    	tree->Branch("st_y", &st_x, "st_y/F");
    	tree->Branch("st_z", &st_x, "st_z/F");
@@ -320,6 +367,12 @@ void ProtonNewTreeMaker::Loop() {
 	bool isTestSample=true;
 	int true_sliceID = -1, reco_sliceID = -1;
 	//int true_st_sliceID = -1, reco_st_sliceID = -1;
+
+	//Basic configure ------//
+	BetheBloch BB;
+	BB.SetPdgCode(pdg);
+	//----------------------//
+
 	for (Long64_t jentry=0; jentry<nentries;jentry++) { //main entry loop
 	//for (Long64_t jentry=0; jentry<4000;jentry++) { //main entry loop
 		Long64_t ientry = LoadTree(jentry);
@@ -931,11 +984,57 @@ void ProtonNewTreeMaker::Loop() {
 
 		//KEff (reco) with const E-loss assumption -----------------------------------//
 		//double mean_Elosscalo_stop=(4.95958e+01)/(1.00489e+00); //using fit [no bmrw]
-		double KE_ff_reco=ke_beam_spec_MeV-mean_Elosscalo_stop;
+		//double KE_ff_reco=ke_beam_spec_MeV-mean_Elosscalo_stop;
 		//double KE_ff_reco=ke_beam_spec_MeV-mean_Elossrange_stop; //kebb
-		double KEend_reco=0;
-		KEend_reco=KE_ff_reco-reco_calo_MeV;		
+		//double KEend_reco=0;
+		//KEend_reco=KE_ff_reco-reco_calo_MeV;		
 		//KEend_reco=BB.KEAtLength(KE_ff_reco, range_reco);		
+
+
+
+
+		//hypothetical length -------------------------------------------------------------------------------------//
+		double fitted_length=-1; 
+		double tmp_fitted_length=BB.Fit_dEdx_Residual_Length(trkdedx, trkres, pdg, false);
+		//double tmp_fitted_length=BB.Fit_Proton_Residual_Length_Likelihood(trkdedx, trkres, pdg, false);
+		if (tmp_fitted_length>0) fitted_length=tmp_fitted_length;
+		double fitted_KE=-50; 
+		if (fitted_length>0) fitted_KE=BB.KEFromRangeSpline(fitted_length);
+
+		double ke_ffbeam_MeV=(ke_beam_spec_MeV-Eloss_mc_hy_stop); //const E-loss with correction
+		//double ke_ffbeam_MeV=fitted_KE;
+		keffbeam=ke_ffbeam_MeV;
+	
+		//ke at end point ---------------------------------------------------------------------//
+		//double kebb=-50; if (fitted_KE>0) kebb=BB.KEAtLength(ke_ffbeam_MeV, range_reco);
+
+		double ratio_range_reco_stop=1.0071824773690985;
+
+		//double kebb=-50; kebb=BB.KEAtLength(ke_ffbeam_MeV, range_reco);
+		double kebb=-1000; kebb=BB.KEAtLength(ke_ffbeam_MeV, range_reco);
+		kend_bb=kebb;
+		double kebb_corr=-1000; kebb_corr=BB.KEAtLength(ke_ffbeam_MeV, range_reco*ratio_range_reco_stop);
+
+		double kebb_fit=-1000; kebb_fit=BB.KEAtLength(fitted_KE, range_reco);
+		//double kebb_truth=-50; kebb_truth=BB.KEAtLength(ke_ff, range_reco);
+		double kebb_truth=-1000; kebb_truth=BB.KEAtLength(ke_ff, range_true);
+
+		double r_keconst_keff=kebb/kebb_truth;
+		double r_kefit_keff=kebb_fit/kebb_truth;
+		double r_kefit_keconst=kebb_fit/kebb;
+
+		double kebb_truerange=-1000; kebb_truerange=BB.KEAtLength(ke_ffbeam_MeV, range_true);
+
+		double kecalo=-1000; kecalo=ke_ffbeam_MeV-ke_calo_MeV;
+		double kend=-1000; kend=1000.*(beamtrk_Eng->at(-2+beamtrk_Eng->size()));
+
+
+
+
+
+
+
+
 
 		//KEend ---------------------------------------------------------------------------//
 		double KEend_true=0;
