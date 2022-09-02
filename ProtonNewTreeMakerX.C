@@ -859,10 +859,10 @@ void ProtonNewTreeMaker::Loop() {
 		vector<double> EDept;
 		vector<double> DEDX;
 		vector<double> DX;
+		vector<double> trkdedx;
+		vector<double> trkres;
 		double pid=-99; 
 		if (IsCaloSize) { //if calo size not empty
-			vector<double> trkdedx;
-			vector<double> trkres;
 			reco_calo_MeV=0;
 			for (size_t h=0; h<primtrk_dedx->size(); ++h) { //loop over reco hits of a given track
 				double hitx_reco=primtrk_hitx->at(h);
@@ -1014,20 +1014,21 @@ void ProtonNewTreeMaker::Loop() {
 		//double kebb=-50; kebb=BB.KEAtLength(ke_ffbeam_MeV, range_reco);
 		double kebb=-1000; kebb=BB.KEAtLength(ke_ffbeam_MeV, range_reco);
 		kend_bb=kebb;
-		double kebb_corr=-1000; kebb_corr=BB.KEAtLength(ke_ffbeam_MeV, range_reco*ratio_range_reco_stop);
 
-		double kebb_fit=-1000; kebb_fit=BB.KEAtLength(fitted_KE, range_reco);
+		//double kebb_corr=-1000; kebb_corr=BB.KEAtLength(ke_ffbeam_MeV, range_reco*ratio_range_reco_stop);
+
+		//double kebb_fit=-1000; kebb_fit=BB.KEAtLength(fitted_KE, range_reco);
 		//double kebb_truth=-50; kebb_truth=BB.KEAtLength(ke_ff, range_reco);
-		double kebb_truth=-1000; kebb_truth=BB.KEAtLength(ke_ff, range_true);
+		//double kebb_truth=-1000; kebb_truth=BB.KEAtLength(ke_ff, range_true);
 
-		double r_keconst_keff=kebb/kebb_truth;
-		double r_kefit_keff=kebb_fit/kebb_truth;
-		double r_kefit_keconst=kebb_fit/kebb;
+		//double r_keconst_keff=kebb/kebb_truth;
+		//double r_kefit_keff=kebb_fit/kebb_truth;
+		//double r_kefit_keconst=kebb_fit/kebb;
 
-		double kebb_truerange=-1000; kebb_truerange=BB.KEAtLength(ke_ffbeam_MeV, range_true);
+		//double kebb_truerange=-1000; kebb_truerange=BB.KEAtLength(ke_ffbeam_MeV, range_true);
 
-		double kecalo=-1000; kecalo=ke_ffbeam_MeV-ke_calo_MeV;
-		double kend=-1000; kend=1000.*(beamtrk_Eng->at(-2+beamtrk_Eng->size()));
+		//double kecalo=-1000; kecalo=ke_ffbeam_MeV-reco_calo_MeV;
+		//double kend=-1000; kend=1000.*(beamtrk_Eng->at(-2+beamtrk_Eng->size()));
 
 
 
