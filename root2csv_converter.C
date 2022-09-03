@@ -12,7 +12,7 @@ using namespace ROOT::Math;
 void root2csv_converter() {
 	//setup input file name -----------------------------------//
 	//TString str_filename="protons_with_additionalinfo_mva2";
-	TString str_filename="protons_mva2_2022_0902";
+	TString str_filename="protons_mva2_20220902";
 	//TString str_file=Form("protons_mva2.root");
 	TString str_file=Form("%s.root",str_filename.Data());
 
@@ -60,6 +60,7 @@ void root2csv_converter() {
 	Int_t nd;
 
 	Float_t keffbeam;
+	Float_t keffhy;
 	Float_t kend_bb;
 
 
@@ -85,12 +86,13 @@ void root2csv_converter() {
 	tr->SetBranchAddress("pbdt",&pbdt);
 	tr->SetBranchAddress("nd",&nd);
 	tr->SetBranchAddress("keffbeam",&keffbeam);
+	tr->SetBranchAddress("keffhy",&keffhy);
 	tr->SetBranchAddress("kend_bb",&kend_bb);
 
 
 	//save header to the csv file --------------------------------------------------------//
 	//TString txt_out="train,tag,target,ntrklen,trklen,PID,B,costheta,mediandedx,endpointdedx,calo,avcalo";
-	TString txt_out="train,tag,target,ntrklen,trklen,PID,B,costheta,mediandedx,endpointdedx,calo,avcalo,st_x,st_y,st_z,end_x,end_y,end_z,pbdt,nd,keffbeam,kend_bb";
+	TString txt_out="train,tag,target,ntrklen,trklen,PID,B,costheta,mediandedx,endpointdedx,calo,avcalo,st_x,st_y,st_z,end_x,end_y,end_z,pbdt,nd,keffbeam,keffhy,kend_bb";
   	//fout<<"train,tag,target,ntrklen,trklen,PID,B,costheta,mediandedx,endpointdedx,calo,avcalo\n";
   	//fout_train<<"tag,target,ntrklen,trklen,PID,B,costheta,mediandedx,endpointdedx,calo,avcalo\n";
   	//fout_test<<"tag,target,ntrklen,trklen,PID,B,costheta,mediandedx,endpointdedx,calo,avcalo\n";
@@ -124,9 +126,9 @@ void root2csv_converter() {
 	   //if (!isTestSample) fout_train<<tag<<","<<TARGET<<","<<ntrklen<<","<<trklen<<","<<PID<<","<<B<<","<<costheta<<","<<mediandedx<<","<<endpointdedx<<","<<calo<<","<<avcalo<<"\n";	
 	   //if (isTestSample) fout_test<<tag<<","<<TARGET<<","<<ntrklen<<","<<trklen<<","<<PID<<","<<B<<","<<costheta<<","<<mediandedx<<","<<endpointdedx<<","<<calo<<","<<avcalo<<"\n";	
 
-	   fout<<train<<","<<tag<<","<<TARGET<<","<<ntrklen<<","<<trklen<<","<<PID<<","<<B<<","<<costheta<<","<<mediandedx<<","<<endpointdedx<<","<<calo<<","<<avcalo<<","<<st_x<<","<<st_y<<","<<st_z<<","<<end_x<<","<<end_y<<","<<end_z<<","<<pbdt<<","<<nd<<","<<keffbeam<<","<<kend_bb<<"\n";	
-	   if (!isTestSample) fout_train<<tag<<","<<TARGET<<","<<ntrklen<<","<<trklen<<","<<PID<<","<<B<<","<<costheta<<","<<mediandedx<<","<<endpointdedx<<","<<calo<<","<<avcalo<<","<<st_x<<","<<st_y<<","<<st_z<<","<<end_x<<","<<end_y<<","<<end_z<<","<<pbdt<<","<<nd<<","<<keffbeam<<","<<kend_bb<<"\n";
-	   if (isTestSample) fout_test<<tag<<","<<TARGET<<","<<ntrklen<<","<<trklen<<","<<PID<<","<<B<<","<<costheta<<","<<mediandedx<<","<<endpointdedx<<","<<calo<<","<<avcalo<<","<<st_x<<","<<st_y<<","<<st_z<<","<<end_x<<","<<end_y<<","<<end_z<<","<<pbdt<<","<<nd<<","<<keffbeam<<","<<kend_bb<<"\n";
+	   fout<<train<<","<<tag<<","<<TARGET<<","<<ntrklen<<","<<trklen<<","<<PID<<","<<B<<","<<costheta<<","<<mediandedx<<","<<endpointdedx<<","<<calo<<","<<avcalo<<","<<st_x<<","<<st_y<<","<<st_z<<","<<end_x<<","<<end_y<<","<<end_z<<","<<pbdt<<","<<nd<<","<<keffbeam<<","<<keffhy<<","<<kend_bb<<"\n";	
+	   if (!isTestSample) fout_train<<tag<<","<<TARGET<<","<<ntrklen<<","<<trklen<<","<<PID<<","<<B<<","<<costheta<<","<<mediandedx<<","<<endpointdedx<<","<<calo<<","<<avcalo<<","<<st_x<<","<<st_y<<","<<st_z<<","<<end_x<<","<<end_y<<","<<end_z<<","<<pbdt<<","<<nd<<","<<keffbeam<<","<<keffhy<<","<<kend_bb<<"\n";
+	   if (isTestSample) fout_test<<tag<<","<<TARGET<<","<<ntrklen<<","<<trklen<<","<<PID<<","<<B<<","<<costheta<<","<<mediandedx<<","<<endpointdedx<<","<<calo<<","<<avcalo<<","<<st_x<<","<<st_y<<","<<st_z<<","<<end_x<<","<<end_y<<","<<end_z<<","<<pbdt<<","<<nd<<","<<keffbeam<<","<<keffhy<<","<<kend_bb<<"\n";
 	}
   	fout.close();
 	fout_train.close();
