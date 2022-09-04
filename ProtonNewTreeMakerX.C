@@ -303,6 +303,7 @@ void ProtonNewTreeMaker::Loop() {
 	Float_t keffbeam=-1;
 	Float_t keffhy=-1;
 	Float_t kend_bb=-1;
+	Float_t kend_fit_bb=-1;
 	
 	Float_t st_x=-999;
 	Float_t st_y=-999;
@@ -332,7 +333,7 @@ void ProtonNewTreeMaker::Loop() {
 	//TString str_out=Form("protons_mva2.root");
 	//TString str_out=Form("protons_nobeamxy_mva2.root");
 	//TString str_out=Form("protons_with_additionalinfo_mva2.root");
-	TString str_out=Form("protons_mva2_20220902.root");
+	TString str_out=Form("protons_mva2_20220904.root");
 
   	TFile *hfile =new TFile(str_out.Data(),"RECREATE");
 	TTree *tree = new TTree("tr","signal");
@@ -350,6 +351,7 @@ void ProtonNewTreeMaker::Loop() {
    	tree->Branch("keffbeam", &keffbeam, "keffbeam/F");
    	tree->Branch("keffhy", &keffhy, "keffhy/F");
    	tree->Branch("kend_bb", &kend_bb, "kend_bb/F");
+   	tree->Branch("kend_fit_bb", &kend_fit_bb, "kend_fit_bb/F");
    	tree->Branch("st_x", &st_x, "st_x/F");
    	tree->Branch("st_y", &st_x, "st_y/F");
    	tree->Branch("st_z", &st_x, "st_z/F");
@@ -1016,7 +1018,9 @@ void ProtonNewTreeMaker::Loop() {
 
 		//double kebb=-50; kebb=BB.KEAtLength(ke_ffbeam_MeV, range_reco);
 		double kebb=-1000; kebb=BB.KEAtLength(ke_ffbeam_MeV, range_reco);
+		double kebb_fit=-1000; kebb_fit=BB.KEAtLength(keffhy, range_reco);
 		kend_bb=kebb;
+		kend_fit_bb=kebb_fit;
 
 		//double kebb_corr=-1000; kebb_corr=BB.KEAtLength(ke_ffbeam_MeV, range_reco*ratio_range_reco_stop);
 
