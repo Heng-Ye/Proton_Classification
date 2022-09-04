@@ -23,46 +23,25 @@ import copy
 
 import time
 from datetime import timedelta
+from argparse import ArgumentParser as ap
 
-#import xgboost
-#print(xgboost.__version__)
+#Read file and feature observables -------------------------------------------------------
+parser = ap()
+parser.add_argument("-d", type=str, help='Data File', default = "")
+parser.add_argument("-f", type=str, help='Feature variables:', default = "'train','tag','target'")
 
-# Graphics in retina format are more sharp and legible
-#%config InlineBackend.figure_format = 'retina'
+args=parser.parse_args()
 
-# install packages if needed --------------
-#pip install pandas if lack of package
-#pip install xgboost if lack of package
-#pip install matplotlib
-#pip install seaborn
-#pip install sklearn
-#pip install xgboost==1.0.1
-#pip install graphviz
+if not (args.d and args.f):
+  print("--> Please provide input data file and feature observables for training!")
+  exit()
 
-# using Pandas.DataFrame data-format, other available format are XGBoost's DMatrix and numpy.ndarray
+if (args.d): print('\nRead data: '+args.d+'.csv')
+if (args.f): print('Feature observables: '+args.f+'\n')
 
-#HEP- Plot Style ------------------------------
-#hep.style.use("CMS") # string aliases work too
-#hep.style.use(hep.style.ROOT)
-#hep.style.use(hep.style.ATLAS)
-
-#start_time
-#start_time = time.monotonic()
-
-#read train and test csv --------------------------------------------------------------------------------
-#train_data = pd.read_csv("protons_mva2_train.csv", sep='\t') #use \t to separate
-#train_data = pd.read_csv("protons_mva2_train.csv", sep=',') 
-#train_data = pd.read_csv("protons_mva2_train.csv", header=None) # no header
-#train_data = pd.read_csv("protons_mva2_train.csv",usecols=[1,2]) # Only reads col1, col2.
-#train_data = pd.read_csv("protons_mva2_train.csv",usecols=['ntrklen']) # Only reads 'ntrklen' 
-#train_data = pd.read_csv("protons_mva2_train.csv", sep=',', header=None, skiprows=1) #skip the top row 
-#train_data = pd.read_csv("protons_mva2_train.csv", sep=',', header=None)
-
-input_file_name='./data_prep/protons_mva2'
+input_file_name=args.d
 train_data = pd.read_csv(input_file_name+'.csv') #read input file
-#train_data = pd.read_csv('protons_with_additionalinfo_mva2.csv') #read all data
-#test_data = pd.read_csv('protons_mva2_test.csv')
-#X, y = train_data.iloc[:,:-1],train_data.iloc[:,-1]
+feature_obs=args.f
 
 #print header info ----------------
 print(train_data.head(3))
@@ -109,7 +88,10 @@ print(train_data.head(3))
 
 
 #Split the columns into 'target(1:signal 0:background)' and the varable columns for training -----------------------------------------------
-var_colums=[c for c in train_data.columns if c not in ['train','tag','target']]
+var_colums=[c for c in train_data.columns if c not in [feature_obs]]
+#var_colums=[c for c in train_data.columns if c not in ['train','tag','target']]
+#var_colums=[c for c in train_data.columns if c not in ['train','tag','target','trklen','costheta','mediandedx','endpointdedx','calo','avcalo','st_x','st_y','st_z','end_x','end_y','end_z','pbdt','nd','keffbeam','keffhy','kend_bb','dkeffbeam_bb','dkeffbeam_calo','dkeffhy_bb','dkeffhy_calo']]
+
 #var_colums=[c for c in train_data.columns if c not in ['train','tag','target','st_x','st_y','st_z','end_x','end_y','end_z','pbdt','nd']]
 X=train_data.loc[:, var_colums]
 y=train_data.loc[:, 'target']
