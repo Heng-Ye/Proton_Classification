@@ -23,35 +23,31 @@ import copy
 
 import time
 from datetime import timedelta
+from argparse import ArgumentParser as ap
 
-#import xgboost
-#print(xgboost.__version__)
+#Read file, feature observables, output file ------------------------------------------------------
+parser = ap()
+parser.add_argument("-d", type=str, help='Data File', default = "")
+parser.add_argument("-f", type=str, help='Feature variables:', default = "'train','tag','target'")
+parser.add_argument("-o", type=str, help='Output model name:', default = "")
 
-# Graphics in retina format are more sharp and legible
-#%config InlineBackend.figure_format = 'retina'
+args=parser.parse_args()
+if not (args.d and args.f and args.o):
+  print("--> Please provide input data file, feature observables, and output model name")
+  exit()
 
-# install packages if needed --------------
-#pip install pandas if lack of package
-#pip install xgboost if lack of package
-#pip install matplotlib
-#pip install seaborn
-#pip install sklearn
-#pip install xgboost==1.0.1
-#pip install graphviz
+input_file_name=args.d
+feature_obs='['+args.f+']'
+output_file_name=args.o
 
-# using Pandas.DataFrame data-format, other available format are XGBoost's DMatrix and numpy.ndarray
-
-#HEP- Plot Style ------------------------------
-#hep.style.use("CMS") # string aliases work too
-#hep.style.use(hep.style.ROOT)
-#hep.style.use(hep.style.ATLAS)
 
 #start_time --------------------
 start_time = time.monotonic()
 
 #Read training and validation files ------------------
-input_file_name='./data_prep/protons_mva2'
-output_file_name='./models/xgb.model'
+#input_file_name='./data_prep/protons_mva2_20220902'
+#input_file_name='./data_prep/protons_mva2'
+#output_file_name='./models/xgb_mva2_20220902.model'
 
 X_train=pd.read_csv(input_file_name+'_X_train.csv')
 X_valid=pd.read_csv(input_file_name+'_X_valid.csv')
@@ -60,7 +56,13 @@ y_valid=pd.read_csv(input_file_name+'_y_valid.csv')
 z_valid=pd.read_csv(input_file_name+'_z_valid.csv')
 
 #Read feature observables --------------------------------------------------------
-feature_names=[c for c in X_train.columns if c not in ['train','tag','target']]
+#feature_names=[c for c in X_train.columns if c not in ['train','tag','target']]
+#feature_names=[c for c in X_train.columns if c not in ['train','tag','target','trklen','costheta','mediandedx','endpointdedx','calo','avcalo','st_x','st_y','st_z','end_x','end_y','end_z','pbdt','nd','keffbeam','keffhy','kend_bb','dkeffbeam_bb','dkeffbeam_calo','dkeffhy_bb','dkeffhy_calo']]
+feature_names=[c for c in X_train.columns if c not in feature_obs]
+
+#ntrklen,trklen,PID,B,costheta,mediandedx,endpointdedx,calo,avcalo,st_x,st_y,st_z,end_x,end_y,end_z,pbdt,nd,keffbeam,keffhy,kend_bb, dkeffbeam_bb, dkeffbeam_calo, dkeffhy_bb, dkeffhy_calo
+
+#st_x,st_y,st_z,end_x,end_y,end_z,pbdt,nd,keffbeam,keffhy,kend_bb, dkeffbeam_bb, dkeffbeam_calo, dkeffhy_bb, dkeffhy_calo
 
 #Build XGBoost Regression Model ----------------------------------------
 #print out all parameters that can be used/tunned

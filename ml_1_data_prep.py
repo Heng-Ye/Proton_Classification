@@ -24,6 +24,8 @@ import copy
 import time
 from datetime import timedelta
 from argparse import ArgumentParser as ap
+#from pandas.compat import StringIO
+import io
 
 #Read file and feature observables -------------------------------------------------------
 parser = ap()
@@ -41,7 +43,7 @@ if (args.f): print('Feature observables: '+args.f+'\n')
 
 input_file_name=args.d
 train_data = pd.read_csv(input_file_name+'.csv') #read input file
-feature_obs=args.f
+feature_obs='['+args.f+']'
 
 #print header info ----------------
 print(train_data.head(3))
@@ -88,9 +90,10 @@ print(train_data.head(3))
 
 
 #Split the columns into 'target(1:signal 0:background)' and the varable columns for training -----------------------------------------------
-var_colums=[c for c in train_data.columns if c not in [feature_obs]]
 #var_colums=[c for c in train_data.columns if c not in ['train','tag','target']]
+var_colums=[c for c in train_data.columns if c not in feature_obs]
 #var_colums=[c for c in train_data.columns if c not in ['train','tag','target','trklen','costheta','mediandedx','endpointdedx','calo','avcalo','st_x','st_y','st_z','end_x','end_y','end_z','pbdt','nd','keffbeam','keffhy','kend_bb','dkeffbeam_bb','dkeffbeam_calo','dkeffhy_bb','dkeffhy_calo']]
+print('var_colums:',var_colums)
 
 #var_colums=[c for c in train_data.columns if c not in ['train','tag','target','st_x','st_y','st_z','end_x','end_y','end_z','pbdt','nd']]
 X=train_data.loc[:, var_colums]
