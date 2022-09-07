@@ -23,6 +23,7 @@ import copy
 
 import time
 from datetime import timedelta
+from argparse import ArgumentParser as ap
 
 #HEP- Plot Style ------------------------------
 hep.style.use("CMS") # string aliases work too
@@ -30,10 +31,35 @@ hep.style.use("CMS") # string aliases work too
 #hep.style.use(hep.style.ATLAS)
 
 #Read training and validation files ------------------
-input_file_name='./data_prep/protons_mva2'
-output_file_name='./models/xgb.model'
-output_path='./plts_perform/'
-output_inel_csv='./csv/xgb_inel_valid.csv'
+#input_file_name='./data_prep/protons_mva2'
+#output_file_name='./models/xgb.model'
+#output_path='./plts_perform/'
+#output_inel_csv='./csv/xgb_inel_valid.csv'
+#input_file_name='./data_prep/protons_mva2_20220902'
+#output_file_name='./models/xgb_mva2_20220902.model'
+#output_path='./plts_perform_20220902/'
+#output_inel_csv='./csv_20220902/xgb_inel_valid.csv'
+
+#Read file, feature observables, output file ------------------------------------------------------
+parser = ap()
+parser.add_argument("-d", type=str, help='Data File', default = "")
+parser.add_argument("-f", type=str, help='Feature variables:', default = "'train','tag','target'")
+parser.add_argument("-o", type=str, help='Output model name:', default = "")
+parser.add_argument("-p", type=str, help='Output plot path:', default = "")
+parser.add_argument("-ocsv", type=str, help='Output csv file:', default = "")
+
+
+args=parser.parse_args()
+if not (args.d and args.f and args.o):
+  print("--> Please provide input data file, feature observables, and output model name")
+  exit()
+
+input_file_name=args.d
+feature_obs='['+args.f+']'
+output_file_name=args.o
+output_path=args.p
+output_inel_csv=args.ocsv
+
 
 X_train=pd.read_csv(input_file_name+'_X_train.csv')
 X_valid=pd.read_csv(input_file_name+'_X_valid.csv')
@@ -42,7 +68,9 @@ y_valid=pd.read_csv(input_file_name+'_y_valid.csv')
 z_valid=pd.read_csv(input_file_name+'_z_valid.csv')
 
 #Read feature observables --------------------------------------------------------
-feature_names=[c for c in X_train.columns if c not in ['train','tag','target']]
+#feature_names=[c for c in X_train.columns if c not in ['train','tag','target']]
+feature_names=[c for c in X_train.columns if c not in feature_obs]
+
 
 #Load model ------------------------------
 model_xgb=xgb.XGBRegressor()
@@ -77,6 +105,13 @@ plt.subplots_adjust(left=0.150, right=0.943)
 plt.savefig(output_path+"xgb_0_importance_plot_xgb_model.eps")
 #plot_importance is based on matplotlib, so the plot can be saved use plt.savefig()
 #print('feature_names',feature_names)
+
+#Correlation matrix ---------------------------------------------------------------------------
+corr=X_train.corr()
+plt.figure(figsize=(10,6))
+sns.heatmap(corr, annot=True)
+plt.savefig(output_path+"xgb_0_heatmap_plot_train.eps")
+
 
 #Model training process, evaluation using auc  ---------------------------------------------
 #[1] AUC vs tree num.
