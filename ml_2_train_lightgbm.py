@@ -25,6 +25,7 @@ import copy
 
 import time
 from datetime import timedelta
+from argparse import ArgumentParser as ap
 
 #import xgboost
 #print(xgboost.__version__)
@@ -52,8 +53,27 @@ from datetime import timedelta
 start_time = time.monotonic()
 
 #Read training and validation files ------------------
-input_file_name='./data_prep/protons_mva2'
-output_file_name='./models/lgbm.model'
+#input_file_name='./data_prep/protons_mva2'
+#output_file_name='./models/lgbm.model'
+#input_file_name='./data_prep/protons_mva2_20220902'
+#output_file_name='./models/lgbm_mva2_20220902.model'
+
+#Read file, feature observables, output file ------------------------------------------------------
+parser = ap()
+parser.add_argument("-d", type=str, help='Data File', default = "")
+parser.add_argument("-f", type=str, help='Feature variables:', default = "'train','tag','target'")
+parser.add_argument("-o", type=str, help='Output model name:', default = "")
+
+args=parser.parse_args()
+if not (args.d and args.f and args.o):
+  print("--> Please provide input data file, feature observables, and output model name")
+  exit()
+
+input_file_name=args.d
+feature_obs='['+args.f+']'
+output_file_name=args.o
+
+
 
 X_train=pd.read_csv(input_file_name+'_X_train.csv')
 X_valid=pd.read_csv(input_file_name+'_X_valid.csv')
@@ -62,7 +82,8 @@ y_valid=pd.read_csv(input_file_name+'_y_valid.csv')
 z_valid=pd.read_csv(input_file_name+'_z_valid.csv')
 
 #Read feature observables --------------------------------------------------------
-feature_names=[c for c in X_train.columns if c not in ['train','tag','target']]
+#feature_names=[c for c in X_train.columns if c not in ['train','tag','target']]
+feature_names=[c for c in X_train.columns if c not in feature_obs]
 
 #Build LightGBM Regression Model ----------------------------------------
 #hyper parameters
