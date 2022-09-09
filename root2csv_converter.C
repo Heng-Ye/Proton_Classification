@@ -101,7 +101,7 @@ void root2csv_converter() {
 	//save header to the csv file --------------------------------------------------------//
 	//TString txt_out="train,tag,target,ntrklen,trklen,PID,B,costheta,mediandedx,endpointdedx,calo,avcalo";
 	//TString txt_out="train,tag,target,ntrklen,trklen,Etrklen,PID,B,costheta,mediandedx,endpointdedx,calo,avcalo,st_x,st_y,st_z,end_x,end_y,end_z,pbdt,nd,keffbeam,keffhy,kend_bb, kend_fit_bb, dkeffbeam_bb, dkeffbeam_calo, dkeffhy_bb, dkeffhy_calo, r_keffhy_keffbeam";
-	TString txt_out="train,tag,target,ntrklen,trklen,Etrklen,PID,B,costheta,mediandedx,endpointdedx,calo,avcalo,keffbeam,keffhy,kendbb, kendfitbb";
+	TString txt_out="train,tag,target,ntrklen,trklen,Etrklen,PID,B,costheta,mediandedx,endpointdedx,calo,avcalo,keffbeam,keffhy,kendbb,kendfitbb";
   	//fout<<"train,tag,target,ntrklen,trklen,PID,B,costheta,mediandedx,endpointdedx,calo,avcalo\n";
   	//fout_train<<"tag,target,ntrklen,trklen,PID,B,costheta,mediandedx,endpointdedx,calo,avcalo\n";
   	//fout_test<<"tag,target,ntrklen,trklen,PID,B,costheta,mediandedx,endpointdedx,calo,avcalo\n";
