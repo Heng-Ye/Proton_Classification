@@ -24,6 +24,8 @@ import copy
 import time
 from datetime import timedelta
 from argparse import ArgumentParser as ap
+#from csv import reader
+from io import StringIO
 
 #Read file, feature observables, output file ------------------------------------------------------
 parser = ap()
@@ -37,9 +39,16 @@ if not (args.d and args.f and args.o):
   exit()
 
 input_file_name=args.d
-feature_obs='['+args.f+']'
+feature_obs=args.f
+feature_obs_del = (args.f).split(',')
 output_file_name=args.o
 
+#feature_del_arr=[]
+#feature_del_arr.append(args.f)
+#feature_del_arr=pd.DataFrame( list(reader(args.f)))
+#feature_del_arr = StringIO(args.f)
+#df = pd.read_clipboard(feature_del_arr, sep =",")
+#print(df)
 
 #start_time --------------------
 start_time = time.monotonic()
@@ -54,6 +63,25 @@ X_valid=pd.read_csv(input_file_name+'_X_valid.csv')
 y_train=pd.read_csv(input_file_name+'_y_train.csv')
 y_valid=pd.read_csv(input_file_name+'_y_valid.csv')
 z_valid=pd.read_csv(input_file_name+'_z_valid.csv')
+
+#Remove the unwanted features ----------
+for col_each in feature_obs_del:
+  del X_train[col_each[1:-1]]
+  del X_valid[col_each[1:-1]]
+
+#print(X_train.head(3))
+
+#print('col_names[0]:',col_names[0])
+#print('feature_del_arr:',feature_del_arr)
+#print(X_train.keys())
+
+#X_valid.drop(columns=feature_del_arr, axis='columns', inplace=True)
+#X_train.drop(columns=[col_names], axis=1, inplace=True)
+#print(X_valid.head(3))
+
+
+#del X_train[feature_obs_del]
+#del X_valid[feature_obs_del]
 
 #Read feature observables --------------------------------------------------------
 #feature_names=[c for c in X_train.columns if c not in ['train','tag','target']]
@@ -101,3 +129,4 @@ end_time = time.monotonic()
 print('Time spent of the code:', timedelta(seconds=end_time - start_time), " sec")
 
 print('feature_names used for training:',feature_names)
+print('f_names=',model_xgb.get_booster().feature_names)
