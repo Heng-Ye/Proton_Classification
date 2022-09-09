@@ -293,6 +293,7 @@ void ProtonNewTreeMaker::Loop() {
 	Int_t tag=0;
 	Float_t ntrklen=-1;
 	Float_t trklen=-1;
+	Float_t Etrklen=-1;
 	Float_t PID=-1;
 	Float_t B=999;
 	Float_t costheta=-999;
@@ -341,6 +342,7 @@ void ProtonNewTreeMaker::Loop() {
    	tree->Branch("tag", &tag, "tag/I");
    	tree->Branch("ntrklen", &ntrklen, "ntrklen/F");
    	tree->Branch("trklen", &trklen, "trklen/F");
+   	tree->Branch("Etrklen", &Etrklen, "Etrklen/F");
    	tree->Branch("B", &B, "B/F");
    	tree->Branch("PID", &PID, "PID/F");
    	tree->Branch("costheta", &costheta, "costheta/F");
@@ -865,7 +867,8 @@ void ProtonNewTreeMaker::Loop() {
 		vector<double> DX;
 		vector<double> trkdedx;
 		vector<double> trkres;
-		double pid=-99; 
+		double pid=-99;
+		double e_range=0; 
 		if (IsCaloSize) { //if calo size not empty
 			reco_calo_MeV=0;
 			for (size_t h=0; h<primtrk_dedx->size(); ++h) { //loop over reco hits of a given track
@@ -905,6 +908,7 @@ void ProtonNewTreeMaker::Loop() {
 					reco_trklen_accum[h] = range_reco;
 				}
 
+				e_range+=cali_dedx*pitch*range_reco;
 				reco_calo_MeV+=cali_dedx*pitch;
 				//cout<<"reco_calo_MeV:"<<reco_calo_MeV<<"="<<cali_dedx<<"*"<<pitch<<endl;
 				//kereco_range+=pitch*dedx_predict(resrange_reco);
@@ -920,6 +924,7 @@ void ProtonNewTreeMaker::Loop() {
 				trkres.push_back(resrange_reco);
 
 			} //loop over reco hits of a given track
+			if (reco_calo_MeV>0) e_range/=reco_calo_MeV;
 
 			pid=chi2pid(trkdedx,trkres); //pid using stopping proton hypothesis
 			mediandedx=TMath::Median(trkdedx.size(), &trkdedx.at(0));
@@ -929,6 +934,7 @@ void ProtonNewTreeMaker::Loop() {
 
 		} //if calo size not empty
 		PID=pid;
+		Etrklen=e_range;
 		//cout<<"reco_calo_MeV:"<<reco_calo_MeV<<endl;
 		calo=reco_calo_MeV;
 		//if (calo>1000.) cout<<"calo:"<<calo<<endl;
