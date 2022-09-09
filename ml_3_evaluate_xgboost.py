@@ -56,10 +56,11 @@ if not (args.d and args.f and args.o):
 
 input_file_name=args.d
 feature_obs='['+args.f+']'
+feature_obs_del = (args.f).split(',')
+
 output_file_name=args.o
 output_path=args.p
 output_inel_csv=args.ocsv
-
 
 X_train=pd.read_csv(input_file_name+'_X_train.csv')
 X_valid=pd.read_csv(input_file_name+'_X_valid.csv')
@@ -67,15 +68,22 @@ y_train=pd.read_csv(input_file_name+'_y_train.csv')
 y_valid=pd.read_csv(input_file_name+'_y_valid.csv')
 z_valid=pd.read_csv(input_file_name+'_z_valid.csv')
 
+#Remove the unwanted features ----------
+for col_each in feature_obs_del:
+  del X_train[col_each[1:-1]]
+  del X_valid[col_each[1:-1]]
+
 #Read feature observables --------------------------------------------------------
 #feature_names=[c for c in X_train.columns if c not in ['train','tag','target']]
 feature_names=[c for c in X_train.columns if c not in feature_obs]
+print('feature_names:',feature_names)
 
 
 #Load model ------------------------------
 model_xgb=xgb.XGBRegressor()
 model_xgb.load_model(output_file_name)
 model_xgb.get_booster().feature_names = feature_names
+#print('f_names=',model_xgb.get_booster().feature_names)
 
 #Evaluate model performance ------------------------------------------------------------------------------
 #Get probability of preditions for every observation that that has been supplied to it
@@ -96,6 +104,7 @@ model_xgb.get_booster().feature_names = feature_names
 #print("AUC Train(bkg): {:.4f}\nAUC Valid(bkg): {:.4f}".format(roc_auc_score(y_train, y_train_bkg_pred),
 #                                                    roc_auc_score(y_valid, y_valid_bkg_pred)))
 
+
 #Feature importance plot ---------------------------------------------------------------------
 plt.rcParams["figure.figsize"] = (16, 9)
 xgb.plot_importance(model_xgb.get_booster(),grid=False)
@@ -109,8 +118,12 @@ plt.savefig(output_path+"xgb_0_importance_plot_xgb_model.eps")
 #Correlation matrix ---------------------------------------------------------------------------
 corr=X_train.corr()
 plt.figure(figsize=(10,6))
+plt.rcParams.update({'font.size': 10})
+#label.set_fontsize(22)
+#plt.rc('font', size=10)
 sns.heatmap(corr, annot=True)
 plt.savefig(output_path+"xgb_0_heatmap_plot_train.eps")
+hep.style.use("CMS") # set back to default style
 
 
 #Model training process, evaluation using auc  ---------------------------------------------
@@ -122,7 +135,7 @@ results = model_xgb.evals_result()
 train_auc_tree_model_xgb  = results['validation_0']['auc']
 #valid_auc_tree_model_xgb  = results['validation_1']['auc']
 
-plt.figure(figsize=(12,9))
+plt.figure(figsize=(26,12))
 plt.plot(train_auc_tree_model_xgb, label='XGBoost Training set')
 #plt.plot(valid_auc_tree_model_xgb , label='valid')
 
@@ -269,17 +282,16 @@ ffrac_misidp=(float)(nnvalid_misidp/nnvalid_tot)
 ffrac_other=(float)(nnvalid_other/nnvalid_tot)
 
 
-'''
-nvalid_inel_bdt=len(XY_valid.loc[(XY_valid['bdt_score']>bdt_cut)&(XY_valid['target']==1)])
-nvalid_inel_old=len(XY_valid.loc[(XY_valid['PID']>10)&(XY_valid['target']==1)])
+#nvalid_inel_bdt=len(XY_valid.loc[(XY_valid['bdt_score']>bdt_cut)&(XY_valid['target']==1)])
+#nvalid_inel_old=len(XY_valid.loc[(XY_valid['PID']>10)&(XY_valid['target']==1)])
 
-#statistics of truth info
-nvalid_s_true=len(bdt_strue)
-nvalid_b_true=len(bdt_btrue)
-nvalid_all_true=(float)(nvalid_s_true+nvalid_b_true)
+##statistics of truth info
+#nvalid_s_true=len(bdt_strue)
+#nvalid_b_true=len(bdt_btrue)
+#nvalid_all_true=(float)(nvalid_s_true+nvalid_b_true)
 
-frac_bdt=nvalid_inel_bdt/nvalid_s_true
-frac_old=nvalid_inel_old/nvalid_s_true
+#frac_bdt=nvalid_inel_bdt/nvalid_s_true
+#frac_old=nvalid_inel_old/nvalid_s_true
 
 #n_all=(float)(n_s+n_b)
 
@@ -287,7 +299,6 @@ frac_old=nvalid_inel_old/nvalid_s_true
 #frac_el=n_b_el/n_all
 #frac_midp=n_b_midp/n_all
 #n_split=(int)(n_all*frac_split)
-'''
 
 print('==Old PID Cut ===================================================================')
 print('Number of all events: {}'.format(nvalid_tot))
@@ -509,4 +520,3 @@ plt.savefig(output_path+'xgb_11_B_PID_BDTcut.eps')
 
 #save validation file -----------------------------
 XY_valid_inel.to_csv(output_inel_csv, index=False)
-
