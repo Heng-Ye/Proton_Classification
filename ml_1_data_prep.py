@@ -26,32 +26,52 @@ from datetime import timedelta
 from argparse import ArgumentParser as ap
 #from pandas.compat import StringIO
 import io
+import ast
+from ast import literal_eval
 
-#Read file and feature observables -------------------------------------------------------
+#Read file and feature observables -----------------------------------------------------------------
 parser = ap()
 parser.add_argument("-d", type=str, help='Data File', default = "")
-parser.add_argument("-f", type=str, help='Feature variables:', default = "'train','tag','target'")
+#parser.add_argument("-f", type=str, help='Feature variables:', default = "'train','tag','target'")
 
 args=parser.parse_args()
 
-if not (args.d and args.f):
+if not (args.d):
   print("--> Please provide input data file and feature observables for training!")
   exit()
 
 if (args.d): print('\nRead data: '+args.d+'.csv')
-if (args.f): print('Feature observables: '+args.f+'\n')
+#if (args.f): print('Feature observables that will NOT be used: '+args.f+'\n')
 
 input_file_name=args.d
 train_data = pd.read_csv(input_file_name+'.csv') #read input file
-feature_obs='['+args.f+']'
+#feature_obs=args.f
+#feature_obs='['+args.f+']'
+#feature_obs = pd.DataFrame([args.f])
+#train_data.columns.tolist()
 
 #print header info ----------------
-print(train_data.head(3))
+#print(train_data.head(3))
+#print('Features that will not be used:',feature_obs)
 #print(train_data.keys())
 #print(train_data.shape)
 #print(train_data.feature_names)
 #train_data.info()
 #train_data.describe()
+
+#remove columns that will not be used
+#train_data.drop(feature_obs, axis=1, inplace=True)
+#del train_data[feature_obs]
+#del train_data['dkeffbeam_bb']
+#del train_data['Etrklen','keffbeam','keffhy','kendbb','kendfitbb']
+#del train_data['keffbeam']
+#print(train_data.head(3))
+
+#print(train_data.head(3))
+
+
+
+
 
 #rename header -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #train_data2=train_data.rename(columns={'tag':'tag', 'ntrklen':'0', 'trklen':'1', 'PID':'2', 'B':'3', 'costheta':'4', 'mediandedx':'5', 'endpointdedx':'6', 'calo':'7', 'avcalo':'8'}, axis=1, inplace=True)
@@ -90,10 +110,12 @@ print(train_data.head(3))
 
 
 #Split the columns into 'target(1:signal 0:background)' and the varable columns for training -----------------------------------------------
-#var_colums=[c for c in train_data.columns if c not in ['train','tag','target']]
-var_colums=[c for c in train_data.columns if c not in feature_obs]
+#var_colums=[c for c in train_data.columns if c not in ['train','tag','target',feature_obs]]
+var_colums=[c for c in train_data.columns if c not in ['train','tag','target']]
+#var_colums=[c for c in train_data.columns if c not in ['train','tag','target','st_x','st_y','st_z','end_x','end_y','end_z','pbdt','nd','keffbeam','keffhy','kend_bb','kend_fit_bb','dkeffbeam_bb','dkeffbeam_calo','dkeffhy_bb','dkeffhy_calo','r_keffhy_keffbeam']]
 #var_colums=[c for c in train_data.columns if c not in ['train','tag','target','trklen','costheta','mediandedx','endpointdedx','calo','avcalo','st_x','st_y','st_z','end_x','end_y','end_z','pbdt','nd','keffbeam','keffhy','kend_bb','dkeffbeam_bb','dkeffbeam_calo','dkeffhy_bb','dkeffhy_calo']]
-print('var_colums:',var_colums)
+#print('var_colums for training:',var_colums)
+
 
 #var_colums=[c for c in train_data.columns if c not in ['train','tag','target','st_x','st_y','st_z','end_x','end_y','end_z','pbdt','nd']]
 X=train_data.loc[:, var_colums]
@@ -129,7 +151,5 @@ X_valid.to_csv(input_file_name+'_X_valid.csv', index=False)
 y_train.to_csv(input_file_name+'_y_train.csv', index=False)
 y_valid.to_csv(input_file_name+'_y_valid.csv', index=False)
 z_valid.to_csv(input_file_name+'_z_valid.csv', index=False)
-
-
 
 

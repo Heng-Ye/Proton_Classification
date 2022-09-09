@@ -57,22 +57,20 @@ z_valid=pd.read_csv(input_file_name+'_z_valid.csv')
 
 #Read feature observables --------------------------------------------------------
 #feature_names=[c for c in X_train.columns if c not in ['train','tag','target']]
-#feature_names=[c for c in X_train.columns if c not in ['train','tag','target','trklen','costheta','mediandedx','endpointdedx','calo','avcalo','st_x','st_y','st_z','end_x','end_y','end_z','pbdt','nd','keffbeam','keffhy','kend_bb','dkeffbeam_bb','dkeffbeam_calo','dkeffhy_bb','dkeffhy_calo']]
 feature_names=[c for c in X_train.columns if c not in feature_obs]
-
-#ntrklen,trklen,PID,B,costheta,mediandedx,endpointdedx,calo,avcalo,st_x,st_y,st_z,end_x,end_y,end_z,pbdt,nd,keffbeam,keffhy,kend_bb, dkeffbeam_bb, dkeffbeam_calo, dkeffhy_bb, dkeffhy_calo
-
-#st_x,st_y,st_z,end_x,end_y,end_z,pbdt,nd,keffbeam,keffhy,kend_bb, dkeffbeam_bb, dkeffbeam_calo, dkeffhy_bb, dkeffhy_calo
+print('feature_names used for training:',feature_names)
 
 #Build XGBoost Regression Model ----------------------------------------
 #print out all parameters that can be used/tunned
 print(xgb.XGBRegressor().get_params())
 
 model_xgb = xgb.XGBRegressor(learning_rate=0.1,
-                                      max_depth=5,
+                                      max_depth=10,
                                       n_estimators=5000,
                                       subsample=0.5,
                                       colsample_bytree=0.5,
+				      min_child_weight=1000,	
+				      eta=1,	
                                       eval_metric='auc',
 				      feature_names=feature_names,
                                       verbosity=1)
@@ -87,6 +85,7 @@ model_xgb = xgb.XGBRegressor(learning_rate=0.1,
 #colsample_bytree: half of the features will be used every time randomly selected when ever a new tree is built in the model
 #eval_metric='auc' which means that while the model is being trained it will be evaluated using area under the curve as a metric
 #verbosity=1 means print out the log
+#min_child_weight[default=1]: The larger min_child_weight is, the more conservative the algorithm will be.
 
 #evaluation data set ------------
 eval_set = [(X_valid, y_valid)]
@@ -100,3 +99,5 @@ model_xgb.save_model(output_file_name)
 #Calculate time spent in the training process --------------------------------------
 end_time = time.monotonic()
 print('Time spent of the code:', timedelta(seconds=end_time - start_time), " sec")
+
+print('feature_names used for training:',feature_names)
