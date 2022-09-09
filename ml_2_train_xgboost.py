@@ -39,7 +39,7 @@ if not (args.d and args.f and args.o):
   exit()
 
 input_file_name=args.d
-feature_obs=args.f
+feature_obs='['+args.f+']'
 feature_obs_del = (args.f).split(',')
 output_file_name=args.o
 
