@@ -68,12 +68,17 @@ z_valid=pd.read_csv(input_file_name+'_z_valid.csv')
 
 #Remove the unwanted features ----------
 for col_each in feature_obs_del:
-  del X_train[col_each[1:-1]]
-  del X_valid[col_each[1:-1]]
-  print('col_each:',col_each)
+  col_find = [col for col in X_train.columns if col_each in col]
+  #print('col_find:',col_find)
+  if bool(col_find):
+    del X_train[col_each[1:-1]]
+    del X_valid[col_each[1:-1]]
+    #print('col_each:',col_each)
+  else:
+    print('accepting all input features!')
 
-print(X_train.head(3))
-print('list of selected columns:', list(X_train))
+#print(X_train.head(3))
+#print('list of selected columns:', list(X_train))
 
 #print('col_names[0]:',col_names[0])
 #print('feature_del_arr:',feature_del_arr)

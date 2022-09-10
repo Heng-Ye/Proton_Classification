@@ -70,8 +70,12 @@ z_valid=pd.read_csv(input_file_name+'_z_valid.csv')
 
 #Remove the unwanted features ----------
 for col_each in feature_obs_del:
-  del X_train[col_each[1:-1]]
-  del X_valid[col_each[1:-1]]
+  col_find = [col for col in X_train.columns if col_each in col]
+  if bool(col_find):
+    del X_train[col_each[1:-1]]
+    del X_valid[col_each[1:-1]]
+  else:
+    print('accepting all input features!')
 
 #Read feature observables --------------------------------------------------------
 #feature_names=[c for c in X_train.columns if c not in ['train','tag','target']]
