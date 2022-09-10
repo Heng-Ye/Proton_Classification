@@ -75,15 +75,16 @@ for col_each in feature_obs_del:
 
 #Read feature observables --------------------------------------------------------
 #feature_names=[c for c in X_train.columns if c not in ['train','tag','target']]
-feature_names=[c for c in X_train.columns if c not in feature_obs]
-print('feature_names:',feature_names)
+feature_names=[c for c in X_train.columns if c not in [args.f]]
 
 
 #Load model ------------------------------
 model_xgb=xgb.XGBRegressor()
 model_xgb.load_model(output_file_name)
 model_xgb.get_booster().feature_names = feature_names
-#print('f_names=',model_xgb.get_booster().feature_names)
+print('feature_names_in_model=',model_xgb.get_booster().feature_names)
+print('feature_names:',feature_names)
+
 
 #Evaluate model performance ------------------------------------------------------------------------------
 #Get probability of preditions for every observation that that has been supplied to it
@@ -520,3 +521,5 @@ plt.savefig(output_path+'xgb_11_B_PID_BDTcut.eps')
 
 #save validation file -----------------------------
 XY_valid_inel.to_csv(output_inel_csv, index=False)
+
+

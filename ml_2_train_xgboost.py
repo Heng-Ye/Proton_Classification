@@ -43,6 +43,8 @@ feature_obs='['+args.f+']'
 feature_obs_del = (args.f).split(',')
 output_file_name=args.o
 
+print('feature_obs:',feature_obs)
+
 #feature_del_arr=[]
 #feature_del_arr.append(args.f)
 #feature_del_arr=pd.DataFrame( list(reader(args.f)))
@@ -68,8 +70,10 @@ z_valid=pd.read_csv(input_file_name+'_z_valid.csv')
 for col_each in feature_obs_del:
   del X_train[col_each[1:-1]]
   del X_valid[col_each[1:-1]]
+  print('col_each:',col_each)
 
-#print(X_train.head(3))
+print(X_train.head(3))
+print('list of selected columns:', list(X_train))
 
 #print('col_names[0]:',col_names[0])
 #print('feature_del_arr:',feature_del_arr)
@@ -85,8 +89,8 @@ for col_each in feature_obs_del:
 
 #Read feature observables --------------------------------------------------------
 #feature_names=[c for c in X_train.columns if c not in ['train','tag','target']]
-feature_names=[c for c in X_train.columns if c not in feature_obs]
-print('feature_names used for training:',feature_names)
+feature_names=[c for c in X_train.columns if c not in [args.f]]
+print('[1]feature_names used for training:',feature_names)
 
 #Build XGBoost Regression Model ----------------------------------------
 #print out all parameters that can be used/tunned
@@ -128,5 +132,6 @@ model_xgb.save_model(output_file_name)
 end_time = time.monotonic()
 print('Time spent of the code:', timedelta(seconds=end_time - start_time), " sec")
 
-print('feature_names used for training:',feature_names)
-print('f_names=',model_xgb.get_booster().feature_names)
+print('[2]feature_names used for training:',feature_names)
+print('feature_names_in_model=',model_xgb.get_booster().feature_names)
+
