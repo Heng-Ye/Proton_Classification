@@ -29,6 +29,7 @@ import copy
 
 import time
 from datetime import timedelta
+from argparse import ArgumentParser as ap
 
 #HEP- Plot Style ------------------------------
 hep.style.use("CMS") # string aliases work too
@@ -36,9 +37,34 @@ hep.style.use("CMS") # string aliases work too
 #hep.style.use(hep.style.ATLAS)
 
 #Read training and validation files ------------------
-input_file_name='./data_prep/protons_mva2'
-output_file_name='./models/lgbm.model'
-output_path='./plts_perform/'
+#input_file_name='./data_prep/protons_mva2'
+#output_file_name='./models/lgbm.model'
+#output_path='./plts_perform/'
+#output_path='./plts_perform_20220902/'
+#input_file_name='./data_prep/protons_mva2_20220902'
+#output_file_name='./models/lgbm_mva2_20220902.model'
+
+#Read file, feature observables, output file ------------------------------------------------------
+parser = ap()
+parser.add_argument("-d", type=str, help='Data File', default = "")
+parser.add_argument("-f", type=str, help='Feature variables:', default = "'train','tag','target'")
+parser.add_argument("-o", type=str, help='Output model name:', default = "")
+parser.add_argument("-p", type=str, help='Output plot path:', default = "")
+parser.add_argument("-ocsv", type=str, help='Output csv file:', default = "")
+
+
+args=parser.parse_args()
+if not (args.d and args.f and args.o):
+  print("--> Please provide input data file, feature observables, and output model name")
+  exit()
+
+input_file_name=args.d
+feature_obs='['+args.f+']'
+feature_obs_del = (args.f).split(',')
+
+output_file_name=args.o
+output_path=args.p
+output_inel_csv=args.ocsv
 
 X_train=pd.read_csv(input_file_name+'_X_train.csv')
 X_valid=pd.read_csv(input_file_name+'_X_valid.csv')
@@ -46,8 +72,18 @@ y_train=pd.read_csv(input_file_name+'_y_train.csv')
 y_valid=pd.read_csv(input_file_name+'_y_valid.csv')
 z_valid=pd.read_csv(input_file_name+'_z_valid.csv')
 
+#Remove the unwanted features ----------
+for col_each in feature_obs_del:
+  col_find = [col for col in X_train.columns if col_each in col]
+  if bool(col_find):
+    del X_train[col_each[1:-1]]
+    del X_valid[col_each[1:-1]]
+  else:
+    print('accepting all input features!')
+
 #Read feature observables --------------------------------------------------------
-feature_names=[c for c in X_train.columns if c not in ['train','tag','target']]
+#feature_names=[c for c in X_train.columns if c not in ['train','tag','target']]
+feature_names=[c for c in X_train.columns if c not in [args.f]]
 
 #Load model -----------------------------------------
 #model_lgbm=lgbm.LGBMRegressor()
@@ -192,7 +228,7 @@ plt.savefig(output_path+'lgbm_4_BDT_predict.eps')
 
 #Use BDT score to select inelastic-scattering events ---------------------
 #evt selection cuts
-bdt_cut=0.5
+bdt_cut=0.55
 
 #select inel. events based on the BDT_score cut (in DataFrame)
 XY_valid_inel=XY_valid.loc[XY_valid['bdt_score']>bdt_cut]

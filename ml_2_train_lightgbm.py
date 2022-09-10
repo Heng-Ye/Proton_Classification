@@ -71,9 +71,10 @@ if not (args.d and args.f and args.o):
 
 input_file_name=args.d
 feature_obs='['+args.f+']'
+feature_obs_del = (args.f).split(',')
 output_file_name=args.o
 
-
+print('feature_obs:',feature_obs)
 
 X_train=pd.read_csv(input_file_name+'_X_train.csv')
 X_valid=pd.read_csv(input_file_name+'_X_valid.csv')
@@ -81,9 +82,21 @@ y_train=pd.read_csv(input_file_name+'_y_train.csv')
 y_valid=pd.read_csv(input_file_name+'_y_valid.csv')
 z_valid=pd.read_csv(input_file_name+'_z_valid.csv')
 
+#Remove the unwanted features ------------------------------------
+for col_each in feature_obs_del:
+  col_find = [col for col in X_train.columns if col_each in col]
+  #print('col_find:',col_find)
+  if bool(col_find):
+    del X_train[col_each[1:-1]]
+    del X_valid[col_each[1:-1]]
+    #print('col_each:',col_each)
+  else:
+    print('accepting all input features!')
+
+
 #Read feature observables --------------------------------------------------------
 #feature_names=[c for c in X_train.columns if c not in ['train','tag','target']]
-feature_names=[c for c in X_train.columns if c not in feature_obs]
+feature_names=[c for c in X_train.columns if c not in [args.f]]
 
 #Build LightGBM Regression Model ----------------------------------------
 #hyper parameters
