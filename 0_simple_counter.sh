@@ -1,6 +1,6 @@
 #!/bin/bash
 
-class_name="ProtonNewTreeMaker"
+class_name="ProtonCounter"
 class_namex=$class_name"X"
 echo $class_namex
 
