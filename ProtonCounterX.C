@@ -196,7 +196,7 @@ void ProtonCounter::Loop() {
 
 		//print out results ----------------------------------------//
 		std::cout<<"================================="<<std::endl;
-		std::cout<<"MC total inel evts :"<<n_inel<<etd::endl;
+		std::cout<<"MC total inel evts :"<<n_inel<<std::endl;
 		std::cout<<"=================================\n"<<std::endl;
 		//----------------------------------------------------------//
 
