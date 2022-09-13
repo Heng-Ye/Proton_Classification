@@ -228,7 +228,7 @@ plt.savefig(output_path+'lgbm_4_BDT_predict.eps')
 
 #Use BDT score to select inelastic-scattering events ---------------------
 #evt selection cuts
-bdt_cut=0.55
+bdt_cut=0.5
 
 #select inel. events based on the BDT_score cut (in DataFrame)
 XY_valid_inel=XY_valid.loc[XY_valid['bdt_score']>bdt_cut]
@@ -239,7 +239,11 @@ XY_valid_inel_old=XY_valid.loc[XY_valid['PID']>10]
 
 
 #statistics of old/new cuts -------------------------------------------------------------------------------
+#no cut
+nvalid_raw_inel=len(XY_valid.loc[XY_valid['tag']==1])
+
 #old PID cut
+#purity
 nvalid_tot=len(XY_valid_inel_old)
 nvalid_inel=len(XY_valid_inel_old.loc[XY_valid_inel_old['tag']==1])
 nvalid_el=len(XY_valid_inel_old.loc[XY_valid_inel_old['tag']==2])
@@ -251,12 +255,20 @@ frac_el=(float)(nvalid_el/nvalid_tot)
 frac_misidp=(float)(nvalid_misidp/nvalid_tot)
 frac_other=(float)(nvalid_other/nvalid_tot)
 
+#rel. eff
+eff_inel=(float)(nvalid_inel/nvalid_raw_inel)
+
 #New BDT cut
+#purity
 nnvalid_tot=len(XY_valid_inel)
 nnvalid_inel=len(XY_valid_inel.loc[XY_valid_inel['tag']==1])
 nnvalid_el=len(XY_valid_inel.loc[XY_valid_inel['tag']==2])
 nnvalid_misidp=len(XY_valid_inel.loc[XY_valid_inel['tag']==5])
 nnvalid_other=nnvalid_tot-nnvalid_inel-nnvalid_el-nnvalid_misidp
+
+#rel. eff
+efff_inel=(float)(nnvalid_inel/nvalid_raw_inel)
+
 
 ffrac_inel=(float)(nnvalid_inel/nnvalid_tot)
 ffrac_el=(float)(nnvalid_el/nnvalid_tot)
@@ -496,5 +508,11 @@ plt.xlim(0, 20)
 plt.ylim(-.5, 250)
 plt.legend(frameon=True,loc='upper right')
 plt.savefig(output_path+'lgbm_11_B_PID_BDTcut.eps')
+
+print('==Relative efficiency: PID and new cut ===========================')
+print('Relative eff [old]: {:0.2f}% ({}/{})'.format(100.*eff_inel, nvalid_inel,nvalid_raw_inel))
+print('Relative eff [new]: {:0.2f}% ({}/{})'.format(100.*efff_inel, nnvalid_inel,nvalid_raw_inel))
+print('Relative eff [new-old]: {:0.2f}%'.format(100.*(efff_inel-eff_inel)))
+print('==================================================================')
 
 

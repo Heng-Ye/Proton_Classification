@@ -262,7 +262,12 @@ XY_valid_inel_old=XY_valid.loc[XY_valid['PID']>10]
 
 
 #statistics of old/new cuts -------------------------------------------------------------------------------
+#no cut
+nvalid_raw_inel=len(XY_valid.loc[XY_valid['tag']==1])
+
+
 #old PID cut
+#purity
 nvalid_tot=len(XY_valid_inel_old)
 nvalid_inel=len(XY_valid_inel_old.loc[XY_valid_inel_old['tag']==1])
 nvalid_el=len(XY_valid_inel_old.loc[XY_valid_inel_old['tag']==2])
@@ -274,7 +279,12 @@ frac_el=(float)(nvalid_el/nvalid_tot)
 frac_misidp=(float)(nvalid_misidp/nvalid_tot)
 frac_other=(float)(nvalid_other/nvalid_tot)
 
+#rel. eff
+eff_inel=(float)(nvalid_inel/nvalid_raw_inel)
+
+
 #New BDT cut
+#purity
 nnvalid_tot=len(XY_valid_inel)
 nnvalid_inel=len(XY_valid_inel.loc[XY_valid_inel['tag']==1])
 nnvalid_el=len(XY_valid_inel.loc[XY_valid_inel['tag']==2])
@@ -285,6 +295,9 @@ ffrac_inel=(float)(nnvalid_inel/nnvalid_tot)
 ffrac_el=(float)(nnvalid_el/nnvalid_tot)
 ffrac_misidp=(float)(nnvalid_misidp/nnvalid_tot)
 ffrac_other=(float)(nnvalid_other/nnvalid_tot)
+
+#rel. eff
+efff_inel=(float)(nnvalid_inel/nvalid_raw_inel)
 
 
 #nvalid_inel_bdt=len(XY_valid.loc[(XY_valid['bdt_score']>bdt_cut)&(XY_valid['target']==1)])
@@ -562,9 +575,7 @@ plt.figure()
 plt.figure(figsize = (12,9))
 plt.title("Event Selection with BDT Cut") 
 #plt.plot(x_ntrklen, y_pid,'ro', markersize=1, label='After event selection')
-
 #plt.plot(XY_valid.loc[:, 'ntrklen'], XY_valid.loc[:, 'PID'], 'ko', markersize=1, label='All events')
-
 plt.plot(XY_valid_inel[XY_valid_inel.tag==1].loc[:,'B'], XY_valid_inel[XY_valid_inel.tag==1].loc[:,'PID'], 'ro', markersize=1, label='Inel.')
 plt.plot(XY_valid_inel[XY_valid_inel.tag==2].loc[:,'B'], XY_valid_inel[XY_valid_inel.tag==2].loc[:,'PID'], 'bo', color='blue', markersize=4, label='El.')
 plt.plot(XY_valid_inel[XY_valid_inel.tag==5].loc[:,'B'], XY_valid_inel[XY_valid_inel.tag==5].loc[:,'PID'], 'go', color='green', markersize=4, label='MisID:P')
@@ -576,9 +587,6 @@ plt.xlim(0, 20)
 plt.ylim(-.5, 250)
 plt.legend(frameon=True,loc='upper right')
 plt.savefig(output_path+'xgb_11_B_PID_BDTcut.eps')
-
-
-
 
 
 #[12]ntrklen vs pid (before inel selection cut) ---------------------------------------------------------------------------------------------------------------------------
@@ -609,6 +617,11 @@ plt.savefig(output_path+'xgb_12_ntrklen_nocut.eps')
 
 
 
+print('==Relative efficiency: PID and new cut ===========================')
+print('Relative eff [old]: {:0.2f}% ({}/{})'.format(100.*eff_inel, nvalid_inel,nvalid_raw_inel))
+print('Relative eff [new]: {:0.2f}% ({}/{})'.format(100.*efff_inel, nnvalid_inel,nvalid_raw_inel))
+print('Relative eff [new-old]: {:0.2f}%'.format(100.*(efff_inel-eff_inel)))
+print('==================================================================')
 
 
 
