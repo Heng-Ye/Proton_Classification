@@ -67,7 +67,6 @@ void ProtonCounter::Loop() {
 		isTestSample = true;
 		if (ientry%2 == 0) { 
 			isTestSample = false; //Divide MC sample by 2 parts: test+ufold
-			train=0;
 		}
 		//if (isTestSample) continue; //only validate sample
 		//if (!isTestSample) continue; //only test sample
