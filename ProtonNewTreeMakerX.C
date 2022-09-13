@@ -1172,7 +1172,7 @@ void ProtonNewTreeMaker::Loop() {
 		//if (!isTestSample&&kinel&&IsBeamXY&&IsPandoraSlice&&IsCaloSize&&IsBQ) {  //train, basic cuts
 		//if (isTestSample&&kinel&&IsBeamXY&&IsPandoraSlice&&IsCaloSize&&IsBQ) {  //test, basic cuts
 		//if (IsBeamXY&&IsPandoraSlice&&IsCaloSize&&IsBQ) {  //test, basic cuts
-		if (IsPandoraSlice&&IsCaloSize&&IsBQ) {  //test, basic cuts
+		if (IsBeamXY&&IsPandoraSlice&&IsCaloSize&&IsBQ) {  //test, basic cuts
 			tree->Fill();
 		} //basic cuts
 
