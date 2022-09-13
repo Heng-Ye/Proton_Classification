@@ -463,6 +463,7 @@ plt.savefig(output_path+'xgb_8_ntrklen_pid_nocut.eps')
 
 #2D scatter plot with truth labels ----------------------------------------------------------------------------------------------------------------
 #[9]ntrklen vs pid ----------------------------------------------------------------------------------------------------------------------------------------------------
+#BDT
 plt.figure()
 plt.figure(figsize = (12,9))
 plt.title("Event Selection with BDT Cut") 
@@ -473,6 +474,7 @@ plt.title("Event Selection with BDT Cut")
 plt.plot(XY_valid_inel[XY_valid_inel.tag==1].loc[:,'ntrklen'], XY_valid_inel[XY_valid_inel.tag==1].loc[:,'PID'], 'ro', markersize=1, label='Inel.')
 plt.plot(XY_valid_inel[XY_valid_inel.tag==2].loc[:,'ntrklen'], XY_valid_inel[XY_valid_inel.tag==2].loc[:,'PID'], 'bo', color='blue', markersize=4, label='El.')
 plt.plot(XY_valid_inel[XY_valid_inel.tag==5].loc[:,'ntrklen'], XY_valid_inel[XY_valid_inel.tag==5].loc[:,'PID'], 'go', color='green', markersize=4, label='MisID:P')
+plt.plot(XY_valid_inel.query('(tag!=1) & (tag!=2) & (tag!=5)').loc[:,'ntrklen'], XY_valid_inel.query('(tag!=1) & (tag!=2) & (tag!=5)').loc[:,'PID'], 'ro', color='gold', markersize=2, label='Others')
 
 plt.xlabel("Normalized Track Length [a.u.]")
 plt.ylabel("$\chi^{2}$ PID [a.u.]")
@@ -481,6 +483,58 @@ plt.xlim(0, 1.3)
 plt.ylim(-.5, 250)
 plt.legend(frameon=True,loc='upper right')
 plt.savefig(output_path+'xgb_9_ntrklen_pid_BDTcut.eps')
+
+
+plt.plot(XY_valid_inel[XY_valid_inel.tag==1].loc[:,'ntrklen'], XY_valid_inel[XY_valid_inel.tag==1].loc[:,'PID'], 'ro', markersize=1, label='Inel.')
+plt.plot(XY_valid_inel[XY_valid_inel.tag==2].loc[:,'ntrklen'], XY_valid_inel[XY_valid_inel.tag==2].loc[:,'PID'], 'bo', color='blue', markersize=4, label='El.')
+plt.plot(XY_valid_inel[XY_valid_inel.tag==5].loc[:,'ntrklen'], XY_valid_inel[XY_valid_inel.tag==5].loc[:,'PID'], 'go', color='green', markersize=4, label='MisID:P')
+plt.plot(XY_valid_inel.query('(tag!=1) & (tag!=2) & (tag!=5)').loc[:,'ntrklen'], XY_valid_inel.query('(tag!=1) & (tag!=2) & (tag!=5)').loc[:,'PID'], 'ro', color='gold', markersize=2, label='Others')
+
+plt.xlabel("Normalized Track Length [a.u.]")
+plt.ylabel("$\chi^{2}$ PID [a.u.]")
+
+plt.xlim(0, 1.3)
+plt.ylim(-.5, 25)
+plt.legend(frameon=True,loc='upper right')
+plt.savefig(output_path+'xgb_9_ntrklen_pid_BDTcut_zoom.eps')
+
+
+
+#PID
+plt.figure()
+plt.figure(figsize = (12,9))
+plt.title("Event Selection with PID Cut") 
+#plt.plot(x_ntrklen, y_pid,'ro', markersize=1, label='After event selection')
+
+#plt.plot(XY_valid.loc[:, 'ntrklen'], XY_valid.loc[:, 'PID'], 'ko', markersize=1, label='All events')
+
+plt.plot(XY_valid_inel_old[XY_valid_inel_old.tag==1].loc[:,'ntrklen'], XY_valid_inel_old[XY_valid_inel_old.tag==1].loc[:,'PID'], 'ro', markersize=1, label='Inel.')
+plt.plot(XY_valid_inel_old[XY_valid_inel_old.tag==2].loc[:,'ntrklen'], XY_valid_inel_old[XY_valid_inel_old.tag==2].loc[:,'PID'], 'bo', color='blue', markersize=4, label='El.')
+plt.plot(XY_valid_inel_old[XY_valid_inel_old.tag==5].loc[:,'ntrklen'], XY_valid_inel_old[XY_valid_inel_old.tag==5].loc[:,'PID'], 'go', color='green', markersize=4, label='MisID:P')
+plt.plot(XY_valid_inel_old.query('(tag!=1) & (tag!=2) & (tag!=5)').loc[:,'ntrklen'], XY_valid_inel_old.query('(tag!=1) & (tag!=2) & (tag!=5)').loc[:,'PID'], 'ro', color='gold', markersize=2, label='Others')
+
+plt.xlabel("Normalized Track Length [a.u.]")
+plt.ylabel("$\chi^{2}$ PID [a.u.]")
+
+plt.xlim(0, 1.3)
+plt.ylim(-.5, 250)
+plt.legend(frameon=True,loc='upper right')
+plt.savefig(output_path+'xgb_9_ntrklen_pid_PIDcut.eps')
+
+#zoom
+plt.plot(XY_valid_inel_old[XY_valid_inel_old.tag==1].loc[:,'ntrklen'], XY_valid_inel_old[XY_valid_inel_old.tag==1].loc[:,'PID'], 'ro', markersize=1, label='Inel.')
+plt.plot(XY_valid_inel_old[XY_valid_inel_old.tag==2].loc[:,'ntrklen'], XY_valid_inel_old[XY_valid_inel_old.tag==2].loc[:,'PID'], 'bo', color='blue', markersize=4, label='El.')
+plt.plot(XY_valid_inel_old[XY_valid_inel_old.tag==5].loc[:,'ntrklen'], XY_valid_inel_old[XY_valid_inel_old.tag==5].loc[:,'PID'], 'go', color='green', markersize=4, label='MisID:P')
+plt.plot(XY_valid_inel_old.query('(tag!=1) & (tag!=2) & (tag!=5)').loc[:,'ntrklen'], XY_valid_inel_old.query('(tag!=1) & (tag!=2) & (tag!=5)').loc[:,'PID'], 'ro', color='gold', markersize=2, label='Others')
+
+plt.xlabel("Normalized Track Length [a.u.]")
+plt.ylabel("$\chi^{2}$ PID [a.u.]")
+
+plt.xlim(0, 1.3)
+plt.ylim(-.5, 25)
+plt.legend(frameon=True,loc='upper right')
+plt.savefig(output_path+'xgb_9_ntrklen_pid_PIDcut_zoom.eps')
+
 
 #[10]trklen vs pid-----------------------------------------------------------------------------------------------------------------------------------------------------
 plt.figure()
@@ -522,6 +576,43 @@ plt.xlim(0, 20)
 plt.ylim(-.5, 250)
 plt.legend(frameon=True,loc='upper right')
 plt.savefig(output_path+'xgb_11_B_PID_BDTcut.eps')
+
+
+
+
+
+#[12]ntrklen vs pid (before inel selection cut) ---------------------------------------------------------------------------------------------------------------------------
+plt.figure()
+plt.figure(figsize = (12,9))
+plt.title("") 
+#plt.plot(x_ntrklen, y_pid,'ro', markersize=1, label='After event selection')
+
+#plt.plot(XY_valid.loc[:, 'ntrklen'], XY_valid.loc[:, 'PID'], 'ko', markersize=1, label='All events')
+
+#plt.plot(XY_valid.loc[:,'ntrklen'], XY_valid.loc[:,'PID'], 'o', markersize=1, label='All')
+plt.plot(XY_valid[XY_valid.tag==1].loc[:,'ntrklen'], XY_valid[XY_valid.tag==1].loc[:,'PID'], 'ro', markersize=1, label='Inel.')
+plt.plot(XY_valid[XY_valid.tag==2].loc[:,'ntrklen'], XY_valid[XY_valid.tag==2].loc[:,'PID'], 'bo', color='blue', markersize=2, label='El.')
+plt.plot(XY_valid[XY_valid.tag==5].loc[:,'ntrklen'], XY_valid[XY_valid.tag==5].loc[:,'PID'], 'go', color='green', markersize=2, label='MisID:P')
+plt.plot(XY_valid.query('(tag!=1) & (tag!=2) & (tag!=5)').loc[:,'ntrklen'], XY_valid.query('(tag!=1) & (tag!=2) & (tag!=5)').loc[:,'PID'], 'ro', color='gold', markersize=2, label='Others')
+
+
+#XY_valid.query('(tag!=1) & (tag!=2) & (tag!=5)').loc[:,'ntrklen'], XY_valid.query('(tag!=1) & (tag!=2) & (tag!=5)').loc[:,'PID']
+#
+
+plt.xlabel("Normalized Track Length [a.u.]")
+plt.ylabel("$\chi^{2}$ PID [a.u.]")
+
+plt.xlim(0, 1.3)
+plt.ylim(-.5, 250)
+plt.legend(frameon=True,loc='upper right')
+plt.savefig(output_path+'xgb_12_ntrklen_nocut.eps')
+
+
+
+
+
+
+
 
 #save validation file -----------------------------
 XY_valid_inel.to_csv(output_inel_csv, index=False)
