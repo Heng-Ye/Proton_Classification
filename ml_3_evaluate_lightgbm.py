@@ -52,7 +52,6 @@ parser.add_argument("-o", type=str, help='Output model name:', default = "")
 parser.add_argument("-p", type=str, help='Output plot path:', default = "")
 parser.add_argument("-ocsv", type=str, help='Output csv file:', default = "")
 
-
 args=parser.parse_args()
 if not (args.d and args.f and args.o):
   print("--> Please provide input data file, feature observables, and output model name")
@@ -110,29 +109,31 @@ y_pred = model_lgbm.predict(X_valid)
 #Model training process, evaluation using auc  ---------------------------------------------
 #[1] AUC vs tree num.
 #results=lgbm.evals_result_(model_lgbm)
+#results=lgbm.LGBMModel.evals_result_(model_lgbm)
 #print(results)
+#lgbm.plot_metric(model_lgbm)
+
 
 #plt.figure(figsize=(12,9))
 #lgbm.plot_metric(model_lgbm)
 #plt.savefig(output_path+'lgbm_1_AUC_train_tree_num_prebuilt.eps')
 
-'''
+
 # Index into each key to find AUC values for training and validation data after each tree
-train_auc_tree_model_lgbm  = results['validation_0']['auc']
-#valid_auc_tree_model_lgbm  = results['validation_1']['auc']
+#train_auc_tree_model_lgbm  = results['validation_0']['auc']
+##valid_auc_tree_model_lgbm  = results['validation_1']['auc']
 
-plt.figure(figsize=(12,9))
-plt.plot(train_auc_tree_model_lgbm, label='LightGBM Training set')
-#plt.plot(valid_auc_tree_model_lgbm , label='valid')
+#plt.figure(figsize=(12,9))
+#plt.plot(train_auc_tree_model_lgbm, label='LightGBM Training set')
+##plt.plot(valid_auc_tree_model_lgbm , label='valid')
 
-#plt.title("Train and validation AUC as number of trees increase")
-plt.title("Training Iteration")
-plt.xlabel("Number of Trees")
-plt.ylabel("AUC (Area under the ROC Curve)")
-plt.legend(frameon=False,loc='center right')
-#plt.show()
-plt.savefig(output_path+'lgbm_1_AUC_train_tree_num_prebuilt.eps')
-'''
+##plt.title("Train and validation AUC as number of trees increase")
+#plt.title("Training Iteration")
+#plt.xlabel("Number of Trees")
+#plt.ylabel("AUC (Area under the ROC Curve)")
+#plt.legend(frameon=False,loc='center right')
+##plt.show()
+#plt.savefig(output_path+'lgbm_1_AUC_train_tree_num_prebuilt.eps')
 
 # evaluate model accuracy -----------------------------
 predictions = [round(value) for value in y_pred]
@@ -313,7 +314,6 @@ print('Number of other events: {} ({:0.2f}%)'.format(nnvalid_other, 100.*ffrac_o
 #print('Purity of new bdt cut: {}'.format(frac_bdt))
 #print('Purity of old chi2 cut: {}'.format(frac_old))
 
-
 #[5] 1D trklen distribution: before/after new/old cuts -------------------------------------------------------------------------------------------------------------
 #before cut ------------------------------------------------------------------------------------------------------------------------------------------------
 plt.figure()
@@ -351,7 +351,6 @@ plt.ylim(0, 1000)
 plt.xlabel("Track Length [cm]")
 plt.ylabel("Events")
 plt.savefig(output_path+'lgbm_5_trklen_beforecut.eps')
-
 
 #[6]PID cut ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 plt.figure()
@@ -514,5 +513,4 @@ print('Relative eff [old]: {:0.2f}% ({}/{})'.format(100.*eff_inel, nvalid_inel,n
 print('Relative eff [new]: {:0.2f}% ({}/{})'.format(100.*efff_inel, nnvalid_inel,nvalid_raw_inel))
 print('Relative eff [new-old]: {:0.2f}%'.format(100.*(efff_inel-eff_inel)))
 print('==================================================================')
-
 

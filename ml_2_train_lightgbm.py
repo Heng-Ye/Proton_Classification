@@ -63,6 +63,8 @@ parser = ap()
 parser.add_argument("-d", type=str, help='Data File', default = "")
 parser.add_argument("-f", type=str, help='Feature variables:', default = "'train','tag','target'")
 parser.add_argument("-o", type=str, help='Output model name:', default = "")
+parser.add_argument("-p", type=str, help='Output plot path:', default = "")
+
 
 args=parser.parse_args()
 if not (args.d and args.f and args.o):
@@ -73,6 +75,8 @@ input_file_name=args.d
 feature_obs='['+args.f+']'
 feature_obs_del = (args.f).split(',')
 output_file_name=args.o
+output_path=args.p
+
 
 print('feature_obs:',feature_obs)
 
@@ -89,7 +93,7 @@ for col_each in feature_obs_del:
   if bool(col_find):
     del X_train[col_each[1:-1]]
     del X_valid[col_each[1:-1]]
-    #print('col_each:',col_each)
+    print('col_each:',col_each)
   else:
     print('accepting all input features!')
 
@@ -103,27 +107,41 @@ feature_names=[c for c in X_train.columns if c not in [args.f]]
 hyper_params = {
     'task': 'train',
     'boosting_type': 'gbdt',
+    #'boosting_type': 'dart',
     'objective': 'regression',
     #'metric': ['l1','l2'],
     'metric': 'auc',	
     'learning_rate': 0.005,
+    #'learning_rate': 0.01,
     'feature_fraction': 0.9,
     'bagging_fraction': 0.7,
     'bagging_freq': 10,
     'verbose': 0,
     "max_depth": 8,
+    #"max_depth": 32,
     "num_leaves": 128,  
+    #"num_leaves": 256,  
     "max_bin": 512,
     "num_iterations": 100000
+    #"num_iterations": 1500
+    #"verbose":-1
 }
 
-
+evals={} # to record eval results for plotting
 model_lgbm = lgb.LGBMRegressor(**hyper_params)
 model_lgbm.fit(X_train, y_train,
         eval_set=[(X_valid, y_valid)],
         eval_metric='auc',
-        early_stopping_rounds=1000)
+        early_stopping_rounds=1000,
+	callbacks = [
+          lgb.log_evaluation(10),
+          lgb.record_evaluation(evals)
+        ]
+)
 
+#plot training process ---------------------------------
+ax = lgb.plot_metric(evals, metric='auc')
+plt.savefig(output_path+'lgbm_1_AUC_train_tree.eps')
 
 
 #Save/output model ---------------------------------
